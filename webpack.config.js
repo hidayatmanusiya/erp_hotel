@@ -34,7 +34,7 @@ module.exports = {
     new ExtractTextPlugin('style.css'),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'public/index.build.html'
+      template: 'public/index.html'
     })
   ],
   resolve: {

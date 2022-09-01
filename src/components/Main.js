@@ -1,12 +1,11 @@
 import Schedule from "./Schedule";
 import { getData } from '../common/Datalayer';
+// import { EventEdit } from "./EventEditor";
 let { StringHelper, DateHelper, EventStore, ResourceStore, DomClassList, WidgetHelper, MessageDialog } = window.bryntum.scheduler;
-
 let schedule;
 let drag;
 
 getData().then((data) => {
-    // console.log(data)
     let toolbar = require('./Toolbar')
     schedule = new Schedule({
         ref: 'schedule',
@@ -17,6 +16,7 @@ getData().then((data) => {
             eventResize: false,
             eventTooltip: false,
             stickyEvents: false,
+            // eventEdit: EventEdit,
             eventDrag: {
                 constrainDragToResource: true
             }
