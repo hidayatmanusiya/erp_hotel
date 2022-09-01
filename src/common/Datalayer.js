@@ -8,12 +8,12 @@ export const getData = async () => {
     });
 
     let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
-    let resourcesArray = await apiPostCall('/', paramsR, frappe?.csrf_token)
+    let resourcesArray = await apiPostCall('/', paramsR, window.frappe?.csrf_token)
     for (let item of resourcesArray) {
         item.id = item.name
     }
     let paramsE = `doctype=Room+Folio+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
-    let eventsArray = await apiPostCall('/', paramsE, frappe?.csrf_token)
+    let eventsArray = await apiPostCall('/', paramsE, window.frappe?.csrf_token)
     for (let item of eventsArray) {
         item.startDate = new Date(item.check_in)
         item.endDate = new Date(item.check_out)
