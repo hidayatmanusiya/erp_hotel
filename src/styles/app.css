@@ -4,9 +4,7 @@
 }
 
 #main {
-  display: flex;
-  flex-direction: row;
-  flex: 1 1 100%;
+  height: 78vh;
 }
 
 #main .b-resourceheader {
@@ -47,19 +45,40 @@
   opacity: 0.8;
   box-sizing: border-box;
 }
-.b-none{
-  display: none!important;
+
+.b-none {
+  display: none !important;
 }
+
 .b-grid-header[data-column="availabilityThisWeek"] .b-grid-header-text-content,
 .b-grid-header[data-column="availabilityNextWeek"] .b-grid-header-text-content {
-	white-space: normal;
+  white-space: normal;
 }
-dl dt{
+
+dl dt {
   margin: 5px 0;
 }
-dl dt.right{
+
+dl dt.right {
   text-align: center;
 }
-dl dt.right img{
+
+dl dt.right img {
   margin: 0 5px;
+}
+
+#page-frontdesk,
+.page-content-wrapper {
+  flex: 1;
+}
+
+.container.my-4 {
+  max-width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.navbar.navbar-light,
+.web-footer {
+  display: none !important;
 }
