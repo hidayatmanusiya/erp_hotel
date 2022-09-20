@@ -167,7 +167,6 @@ export const tbar = [
 ]
 
 export const EventEdit = {
-    // Add extra widgets to the event editor
     items: {
         nameField: null,
         resourceField: null,
@@ -206,23 +205,4 @@ export const EventEdit = {
             }
         }
     },
-    // loadRecord(eventRecord, resourceRecord) {
-        // console.log(eventRecord.data, resourceRecord.data)
-        // let editorPopup = this.editor;
-        // EventEdit.items.customerCombo.store = ['aa', 'dd']
-        // console.log(EventEdit.items.customerCombo.store)
-    // }
-    // getEditor: function () {
-    //     const me = this;
-    //     let { editor } = me;
-    //     // debugger
-    //     // editor = me.editor = Widget.create(me.getEditorConfig());
-    //     let customers = JSON.parse(window.sessionStorage.getItem('customers'))
-    //     let packages = JSON.parse(window.sessionStorage.getItem('packages'))
-    //     EventEdit.items.customerCombo.store = customers
-    //     // console.log(EventEdit.items.customerCombo.store)
-    //     // editor.items[0].items = customers
-    //     // editor.items[1].items = packages
-    //     // return me;
-    // }
 }

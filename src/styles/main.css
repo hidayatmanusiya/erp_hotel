@@ -14,7 +14,7 @@ body {
   color: #fff;
   padding: 1em 0;
   transition: background-color .5s, padding .5s, font-size .1s;
-  background-color: #2a6ac5;
+  background-color: #0f172b;
   flex: 0 0 auto;
 }
 
@@ -59,7 +59,7 @@ body {
   color: #fff;
   padding: 1em 0;
   transition: background-color .5s, padding .5s, font-size .1s;
-  background-color: #2a6ac5;
+  background-color: #0f172b;
   flex: 0 0 auto;
 }
 

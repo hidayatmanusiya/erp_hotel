@@ -1,6 +1,6 @@
 export default {
-    apiURL: 'http://localhost:8000',
-    token: 'token 6ba0718a1c0f873:f21bc024d45a0d1',
+    apiURL: 'https://hotel.bizmap.in',
+    token: 'token c2609de4fbfd645:a37f3ea3eac89f3',
     formatTime: (date) => {
         const newDate = new Date(date);
         let month = newDate.getMonth() + 1
