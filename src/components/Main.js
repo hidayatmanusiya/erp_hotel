@@ -1,6 +1,7 @@
 import Schedule from "./Schedule";
 import { settings, searchData, saveData, myStore } from '../common/Datalayer';
 import { columns, localTooltips, tbar, EventEdit } from '../common/Columns';
+import Config from '../common/Config'
 import Toolbar from './Toolbar'
 let { StringHelper, DateHelper } = window.bryntum.scheduler;
 
@@ -19,7 +20,9 @@ let schedule = new Schedule({
         eventTooltip: localTooltips,
         group: 'room_type_name',
         eventEdit: EventEdit,
+
     },
+    // createEventOnDblClick: false,
     columns: columns,
     rowHeight: 20,
     viewPreset: {
@@ -36,6 +39,12 @@ let schedule = new Schedule({
     eventLayout: 'none',
     managedEventSizing: false,
     listeners: {
+        beforeEventEdit({ eventRecord }) {
+            if (eventRecord.data.idx == 0) {
+                window.open(Config.apiURL + "/app/room-folio-hms/" + eventRecord.data.id, '_blank');
+                return false
+            }
+        },
         beforeEventEditShow({ eventRecord, editor }) {
             editor.title = (eventRecord.data.idx == 0) ? `Modifier ${eventRecord.name || ''}` : 'New Booking';
             let customers = JSON.parse(window.sessionStorage.getItem('customers'))

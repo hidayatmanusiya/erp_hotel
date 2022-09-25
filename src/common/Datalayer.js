@@ -89,6 +89,7 @@ export const settings = async () => {
     }
     let statusCombo = schedule.tbar.items[5]
     statusCombo.store.data = statusArray
+    window.sessionStorage.setItem('roomStatus', JSON.stringify(statusArray))
 
 
     // Customer
