@@ -39,7 +39,7 @@ let schedule = new Schedule({
     eventLayout: 'none',
     managedEventSizing: false,
     listeners: {
-        beforeEventEdit({ eventRecord }) {
+        beforeEventEdit({ eventRecord, editor }) {
             if (eventRecord.data.idx == 0) {
                 window.open(Config.apiURL + "/app/room-folio-hms/" + eventRecord.data.id, '_blank');
                 return false
@@ -50,13 +50,17 @@ let schedule = new Schedule({
             let customers = JSON.parse(window.sessionStorage.getItem('customers'))
             let customersCombo = editor.items[0]
             customersCombo.store.data = customers
+            let contacts = JSON.parse(window.sessionStorage.getItem('contacts'))
+            let contactsCombo = editor.items[1]
+            contactsCombo.store.data = contacts
             let packages = JSON.parse(window.sessionStorage.getItem('packages'))
-            let packagesCombo = editor.items[1]
+            let packagesCombo = editor.items[2]
             packagesCombo.store.data = packages
+
         },
         afterEventSave({ eventEdit, eventRecord }) {
             saveData(eventRecord.data);
-        }
+        },
     },
     eventRenderer({ eventRecord, resourceRecord, renderData }) {
         let startEndMarkers = '';

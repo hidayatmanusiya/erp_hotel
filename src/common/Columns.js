@@ -1,17 +1,36 @@
-let { DateHelper, Widget } = window.bryntum.scheduler;
+let { DateHelper } = window.bryntum.scheduler;
 import { apiPostCall } from './SiteAPIs'
 import { searchData } from '../common/Datalayer';
+import Config from './Config'
+let endDate = new Date()
+endDate.setDate(endDate.getDate() + 14)
+
 export const columns = [
     {
-        text: 'status', field: 'status', width: 20, region: 'left',
+        text: 'Status',
+        field: 'status',
+        width: 20,
+        region: 'left',
         htmlEncode: false,
-        editor: null,
         renderer({ value }) {
             let roomStatus = JSON.parse(window.sessionStorage.getItem('roomStatus'))
             if (roomStatus) {
                 const status = roomStatus.filter(element => element.name == value);
                 return `<div class="capacity b-fa b-fa-${status[0]?.icon}"></div>`;
             }
+        },
+        editor: {
+            type: 'combo',
+            items: ['Out Of Order', 'Availabel', 'Dirty', 'Occupied'],
+            editable: false,
+            listeners: {
+                select: (e) => {
+                    if (e?.source?.initialValue != e?.record?.data?.text) {
+                        //    console.log(e?.source)
+                        //    debugger
+                    }
+                },
+            },
         }
     },
     { text: '', editor: null, sort: null, field: 'room_type', width: 100, region: 'left' },
@@ -42,6 +61,7 @@ export const tbar = [
         type: 'DateField',
         ref: 'startDate',
         name: 'start_date',
+        value: new Date(),
         weight: 50,
         placeholder: 'Start Date',
         clearable: true,
@@ -50,6 +70,7 @@ export const tbar = [
         type: 'DateField',
         ref: 'endDate',
         name: 'end_date',
+        value: endDate,
         weight: 50,
         placeholder: 'End Date',
         clearable: true,
@@ -183,7 +204,25 @@ export const EventEdit = {
             items: [],
             name: 'customer',
             label: 'Customer',
-            placeholder: 'Select customer',
+            placeholder: 'Select Customer',
+            weight: 130,
+            clearable: true,
+            triggerAction: 'all',
+            listeners: {
+                select: (e) => {
+                    if (e?.record?.data?.id && e?.record?.data?.id == 'new') {
+                        window.open(Config.apiURL + "/app/user/new-user-1", '_blank');
+                    }
+                },
+            },
+        },
+        contactsCombo: {
+            type: 'combo',
+            ref: 'contactsCombo',
+            name: 'contact',
+            items: [],
+            label: 'Contact',
+            placeholder: 'Select Contact',
             weight: 130,
             clearable: true,
         },
@@ -194,6 +233,16 @@ export const EventEdit = {
             items: [],
             label: 'Package',
             placeholder: 'Select Package',
+            weight: 130,
+            clearable: true,
+        },
+        roomsCombo: {
+            type: 'combo',
+            ref: 'roomsCombo',
+            name: 'rooms',
+            items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            label: 'No of Room',
+            placeholder: 'Select Rooms',
             weight: 130,
             clearable: true,
         },

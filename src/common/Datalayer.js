@@ -3,6 +3,7 @@ import Config from './Config'
 const { Mask } = window.bryntum.scheduler;
 
 export const searchData = async (params) => {
+
     Mask.mask({
         text: 'Loading Data ...',
         mode: 'dark-blur'
@@ -19,7 +20,10 @@ export const searchData = async (params) => {
         filtersR.push(["Room HMS", "company", "=", item.name])
     }
     for (let item of params.roomType) {
-        filtersR.push(["Room HMS", "room_type", "=", item.name])
+        filtersR.push(["Room HMS", "room_type", "=", item])
+    }
+    for (let item of params.propertie) {
+        filtersR.push(["Room HMS", "property", "=", item])
     }
     for (let item of params.status) {
         filtersR.push(["Room HMS", "status", "=", item.name])
@@ -35,21 +39,26 @@ export const searchData = async (params) => {
         filtersE.push(["Room Folio HMS", "company", "=", item.name])
     }
     for (let item of params.roomType) {
-        filtersE.push(["Room Folio HMS", "room_type", "=", item.name])
+        filtersE.push(["Room Folio HMS", "room_type", "=", item])
     }
     for (let item of params.propertie) {
-        // filtersE.push(["Room Folio HMS", "propertie", "=", item])
+        filtersE.push(["Room Folio HMS", "property", "=", item])
     }
     if (params.startDate && params.endDate) {
         let date = new Date(params.startDate)
-        let fromDate = `${date.getFullYear()}-${date.getMonth() < 10 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`
+        let fromDate = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
         filtersE.push(["Room Folio HMS", "check_in", ">=", fromDate])
         let date1 = new Date(params.endDate)
-        let fromDate1 = `${date.getFullYear()}-${date.getMonth() < 10 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`
+        let fromDate1 = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
         filtersE.push(["Room Folio HMS", "check_out", "<=", fromDate1])
 
         schedule.startDate = new Date(params.startDate)
         schedule.endDate = new Date(params.endDate)
+    } else {
+        let endDate = new Date()
+        endDate.setDate(endDate.getDate() + 14)
+        schedule.startDate = new Date()
+        schedule.endDate = new Date(endDate)
     }
 
     let paramsE = `doctype=Room+Folio+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
@@ -70,6 +79,15 @@ export const searchData = async (params) => {
 export const settings = async () => {
     const schedule = window.bryntum.get('scheduler');
 
+    // Contact
+    let contactParams = `doctype=Contact&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
+    let contactArray = await apiPostCall('/', contactParams, window.frappe?.csrf_token)
+    for (let item of contactArray) {
+        item.id = item.name
+        item.text = item.name
+    }
+    window.sessionStorage.setItem('contacts', JSON.stringify(contactArray))
+
     // Company
     let companyParams = `doctype=Company&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
     let companyArray = await apiPostCall('/', companyParams, window.frappe?.csrf_token)
@@ -87,6 +105,7 @@ export const settings = async () => {
         item.id = item.name
         item.text = item.name
     }
+
     let statusCombo = schedule.tbar.items[5]
     statusCombo.store.data = statusArray
     window.sessionStorage.setItem('roomStatus', JSON.stringify(statusArray))
@@ -99,6 +118,7 @@ export const settings = async () => {
         item.id = item.name
         item.text = item.name
     }
+    customerArray.push({ id: 'new', text: "Add New" })
     window.sessionStorage.setItem('customers', JSON.stringify(customerArray))
 
     // Package
@@ -114,16 +134,34 @@ export const settings = async () => {
 export const saveData = async (event) => {
     const schedule = window.bryntum.get('scheduler');
     const resource = schedule.resourceStore.data.filter(element => element.name == event.resourceId);
-    var data = JSON.stringify({
-        "status": "Pre CheckIn",
-        "customer": event?.customer?.name,
-        "company": resource[0].company,
-        "room_type": resource[0].room_type,
-        "room_no": resource[0].room_no,
-        "room_package": event.room_package.name,
-        "check_in": Config.formatTime(event.startDate),
-        "check_out": Config.formatTime(event.endDate)
-    });
-    let bookRoom = await apiPostCall('/api/resource/Room Folio HMS', data, window.frappe?.csrf_token)
-    console.log(bookRoom)
+    let date = new Date()
+    let data = JSON.stringify(
+        {
+            "customer": event?.customer?.name,
+            "order_type": "Sales",
+            "company": resource[0].company,
+            "transaction_date": `${date.getFullYear()}-${date.getMonth() - 1}-${date.getDate()}`,
+            "guest_cf": event?.contact?.name,
+            "currency": "INR",
+            "conversion_rate": 1,
+            "selling_price_list": "Standard Selling",
+            "price_list_currency": "INR",
+            "plc_conversion_rate": 1,
+            "check_in_cf": Config.formatTime(event.startDate),
+            "no_of_nights_cf": Config.days(event.endDate, event.startDate),
+            "check_out_cf": Config.formatTime(event.endDate),
+            "room_type_cf": resource[0].room_type,
+            "room_package_cf": event.room_package.name,
+            "status": "Draft",
+            "items": [
+                {
+                    "item_code": event.room_package.name,
+                    "item_group": "Room Charge",
+                    "stock_uom": "Nos",
+                    "qty": event.rooms,
+                }
+            ],
+        }
+    );
+    let bookRoom = await apiPostCall('/api/resource/Sales Order', data, window.frappe?.csrf_token)
 }
