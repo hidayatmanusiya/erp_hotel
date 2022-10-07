@@ -102,6 +102,19 @@ export const tbar = [
                 const schedule = window.bryntum.get('scheduler');
                 let propertieCombo = schedule.tbar.items[3]
                 propertieCombo.store.data = propertyArray
+
+                // roomTypeArray
+                let roomTypeArray = []
+                let roomTypeParams = `doctype=Room+Type+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify([])}&limit_page_length=None`;
+                roomTypeArray = await apiPostCall('/', roomTypeParams, window.frappe?.csrf_token)
+                for (let item of roomTypeArray) {
+                    item.id = item.name
+                    item.text = item.name
+                }
+                const schedule1 = window.bryntum.get('scheduler');
+                let roomTypeCombo = schedule1.tbar.items[4]
+                roomTypeCombo.store.data = roomTypeArray
+
             }
         }
     },
@@ -115,25 +128,7 @@ export const tbar = [
         clearable: true,
         multiSelect: true,
         listeners: {
-            async change({ value }) {
-                // Room Type
-                let filters = []
-                let roomTypeArray = []
-                for (let item of value) {
-                    // filters.push(["Property Child table", "property_name", "=", item.name])
-                }
-                // if (filters.length > 0) {
-                let roomTypeParams = `doctype=Room+Type+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filters)}&limit_page_length=None`;
-                roomTypeArray = await apiPostCall('/', roomTypeParams, window.frappe?.csrf_token)
-                for (let item of roomTypeArray) {
-                    item.id = item.name
-                    item.text = item.name
-                }
-                // }
-                const schedule = window.bryntum.get('scheduler');
-                let roomTypeCombo = schedule.tbar.items[4]
-                roomTypeCombo.store.data = roomTypeArray
-            }
+
         }
     },
     {
