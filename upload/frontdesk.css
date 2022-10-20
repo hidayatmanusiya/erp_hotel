@@ -581,7 +581,13 @@ dl dt.right img {
   display: none !important;
 }
 
-.b-grid-header-text  { padding : 0; } body {
+.b-grid-header-text {
+  padding: 0;
+}
+
+.b-chipview.b-chips-closable .b-chip {
+  white-space: nowrap !important;
+}body {
   min-height: 100vh;
   background-color: aquamarine;
 }
