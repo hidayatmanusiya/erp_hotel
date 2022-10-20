@@ -32,7 +32,7 @@ let schedule = new Schedule({
             {
                 unit: 'day',
                 align: 'center',
-                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'ddd, DD MMM')}</div>`
+                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd, DD MMM')}</div>`
             }
         ]
     },
@@ -65,7 +65,7 @@ let schedule = new Schedule({
     eventRenderer({ eventRecord, resourceRecord, renderData }) {
         let startEndMarkers = '';
         renderData.cls[eventRecord.status] = 1;
-        return startEndMarkers + StringHelper.encodeHtml(eventRecord.customer);
+        return startEndMarkers + StringHelper.encodeHtml(eventRecord.customer ? eventRecord.customer : 'New');
     },
     tbar: tbar
 });

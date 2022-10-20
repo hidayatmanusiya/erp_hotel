@@ -83,6 +83,16 @@ export const tbar = [
         weight: 50,
         multiSelect: true,
         clearable: true,
+        chipView: {
+            scrollable: {
+                overflowY: false,
+                overflowX: 'hidden-scroll'
+            },
+            style: {
+                flexFlow: 'nowrap',
+                fontSize: 12
+            }
+        },
         listeners: {
             async change({ value }) {
                 // Property
@@ -100,8 +110,8 @@ export const tbar = [
                     }
                 }
                 const schedule = window.bryntum.get('scheduler');
-                let propertieCombo = schedule.tbar.items[3]
-                propertieCombo.store.data = propertyArray
+                const comboPropertie = schedule.tbar.items.find(element => element._ref == 'propertieCombo');
+                comboPropertie.store.data = propertyArray
 
                 // roomTypeArray
                 let roomTypeArray = []
@@ -111,9 +121,8 @@ export const tbar = [
                     item.id = item.name
                     item.text = item.name
                 }
-                const schedule1 = window.bryntum.get('scheduler');
-                let roomTypeCombo = schedule1.tbar.items[4]
-                roomTypeCombo.store.data = roomTypeArray
+                const comboRoomType = schedule.tbar.items.find(element => element._ref == 'roomTypeCombo');
+                comboRoomType.store.data = roomTypeArray
 
             }
         }
@@ -127,6 +136,16 @@ export const tbar = [
         placeholder: 'Select Propertie',
         clearable: true,
         multiSelect: true,
+        chipView: {
+            scrollable: {
+                overflowY: false,
+                overflowX: 'hidden-scroll'
+            },
+            style: {
+                flexFlow: 'nowrap',
+                fontSize: 12
+            }
+        },
         listeners: {
 
         }
@@ -139,6 +158,16 @@ export const tbar = [
         placeholder: 'Select RoomType',
         multiSelect: true,
         clearable: true,
+        chipView: {
+            scrollable: {
+                overflowY: false,
+                overflowX: 'hidden-scroll'
+            },
+            style: {
+                flexFlow: 'nowrap',
+                fontSize: 12
+            }
+        },
         listeners: {
 
         }
@@ -151,6 +180,16 @@ export const tbar = [
         multiSelect: true,
         placeholder: 'Select Status',
         clearable: true,
+        chipView: {
+            scrollable: {
+                overflowY: false,
+                overflowX: 'hidden-scroll'
+            },
+            style: {
+                flexFlow: 'nowrap',
+                fontSize: 12
+            }
+        },
         listeners: {
 
         }
