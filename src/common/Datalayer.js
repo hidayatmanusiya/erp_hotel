@@ -175,6 +175,8 @@ export const saveData = async (event) => {
             "check_out_cf": Config.formatTime(event.endDate),
             "room_type_cf": resource[0].room_type,
             "room_package_cf": event.room_package.name,
+            // "property": event.room_package.name,
+            "room_no": resource[0].name,
             "status": "Draft",
             "items": [
                 {

@@ -69,7 +69,7 @@ let schedule = new Schedule({
     eventRenderer({ eventRecord, resourceRecord, renderData }) {
         let startEndMarkers = '';
         renderData.cls[eventRecord.status] = 1;
-        return startEndMarkers + StringHelper.encodeHtml(eventRecord.customer ? eventRecord.customer : 'New');
+        return startEndMarkers + StringHelper.encodeHtml(eventRecord?.customer ? (eventRecord?.customer?.customer_name ? eventRecord?.customer?.customer_name : eventRecord.customer) : 'New');
     },
     tbar: tbar
 });

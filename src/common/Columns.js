@@ -42,19 +42,20 @@ export const localTooltips = {
         titleAlign: 'start'
     },
     onBeforeShow({ source: tooltip }) {
-        tooltip.title = tooltip.eventRecord.customer
+        tooltip.title = tooltip?.eventRecord?.customer?.customer_name ? tooltip.eventRecord.customer.customer_name : tooltip.eventRecord.customer
     },
     template: data => {
         let newData = data.eventRecord.data
         return `<dl>
-        <dt>Company:  <b>${newData.company}</b></dt>
-        <dt>Room NO:  <b>${newData.room_no}</b></dt>
-        <dt>Room Package:  <b>${newData.room_package}</b></dt>
+        <dt>Company:  <b>${newData?.company ? newData?.company : ''}</b></dt>
+        <dt>Room NO:  <b>${newData?.room_no ? newData?.room_no : newData?.resourceId}</b></dt>
+        <dt>Room Package:  <b>${newData?.room_package ? newData?.room_package?.name : newData?.room_package_cf}</b></dt>
         <dt>Check In/Out: <b>${DateHelper.format(data.eventRecord.startDate, 'ddd MM/DD')} - ${DateHelper.format(data.eventRecord.endDate, 'ddd MM/DD')}</b></dt>
     </dl>
     `
     }
 }
+
 
 export const tbar = [
     {
