@@ -35,22 +35,28 @@ export const searchData = async (params) => {
     }
     // Room Folio HMS
     let filtersE = []
+    let filtersS = []
     for (let item of params.company) {
         filtersE.push(["Room Folio HMS", "company", "=", item.name])
+        filtersS.push(["Sales Order", "company", "=", item.name])
     }
     for (let item of params.roomType) {
         filtersE.push(["Room Folio HMS", "room_type", "=", item])
+        filtersS.push(["Sales Order", "room_type", "=", item])
     }
     for (let item of params.propertie) {
         filtersE.push(["Room Folio HMS", "property", "=", item])
+        filtersS.push(["Sales Order", "property", "=", item])
     }
     if (params.startDate && params.endDate) {
         let date = new Date(params.startDate)
         let fromDate = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
         filtersE.push(["Room Folio HMS", "check_in", ">=", fromDate])
+        filtersS.push(["Sales Order", "check_in_cf", ">=", fromDate])
         let date1 = new Date(params.endDate)
         let fromDate1 = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
         filtersE.push(["Room Folio HMS", "check_out", "<=", fromDate1])
+        filtersS.push(["Sales Order", "check_out_cf", "<=", fromDate1])
 
         schedule.startDate = new Date(params.startDate)
         schedule.endDate = new Date(params.endDate)
@@ -63,16 +69,33 @@ export const searchData = async (params) => {
 
     let paramsE = `doctype=Room+Folio+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
     let eventsArray = await apiPostCall('/', paramsE, window.frappe?.csrf_token)
+    let paramsS = `doctype=Sales+Order&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
+    let eventsArrayS = await apiPostCall('/', paramsS, window.frappe?.csrf_token)
+    let events = []
+    let tempEventIds = {}
     for (let item of eventsArray) {
-        item.startDate = new Date(item.check_in)
-        item.endDate = new Date(item.check_out)
-        item.id = item.name
-        item.resourceId = item.room_no
-        item.text = item.customer
+        if (item.status == 'Pre-Check In' || item.status == 'Checked In' || item.status == 'Checked Out') {
+            item.startDate = new Date(item.check_in)
+            item.endDate = new Date(item.check_out)
+            item.id = item.name
+            item.resourceId = item.room_no
+            item.text = item.customer
+            events.push(item)
+            tempEventIds[item.reservation] = true
+        }
     }
-
+    for (let item of eventsArrayS) {
+        if (item.name in tempEventIds == false) {
+            item.startDate = new Date(item.check_in_cf)
+            item.endDate = new Date(item.check_out_cf)
+            item.id = item.name
+            item.resourceId = item.room_no
+            item.text = item.customer
+            events.push(item)
+        }
+    }
     schedule.resourceStore.data = resourcesArray
-    schedule.eventStore.data = eventsArray
+    schedule.eventStore.data = events
     Mask.unmask();
 }
 

@@ -245,7 +245,7 @@ export const EventEdit = {
             listeners: {
                 select: (e) => {
                     if (e?.record?.data?.id && e?.record?.data?.id == 'new') {
-                        window.open(Config.apiURL + "/app/user/new-user-1", '_blank');
+                        window.open(Config.apiURL + "/app/customer/new-customer-1", '_blank');
                     }
                 },
             },

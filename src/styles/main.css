@@ -235,3 +235,28 @@ body {
   background-color: limegreen;
   color: black;
 }
+
+.b-sch-style-plain.b-sch-color-indigo {
+  background-color: #ccc !important;
+  border-color: #ccc !important;
+}
+
+.b-sch-style-plain.b-sch-color-indigo .Pre-Check.In {
+  background-color: orange !important;
+  border-color: orange !important;
+}
+
+.b-sch-style-plain.b-sch-color-indigo .Checked.In {
+  background-color: mediumseagreen !important;
+  border-color: mediumseagreen !important;
+}
+
+.b-sch-style-plain.b-sch-color-indigo .Checked.Out {
+  background-color: black !important;
+  border-color: black !important;
+}
+
+.b-sch-style-plain.b-sch-color-indigo .Draft {
+  background-color: purple !important;
+  border-color: purple !important;
+}

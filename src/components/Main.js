@@ -41,7 +41,11 @@ let schedule = new Schedule({
     listeners: {
         beforeEventEdit({ eventRecord, editor }) {
             if (eventRecord.data.idx == 0) {
-                window.open(Config.apiURL + "/app/room-folio-hms/" + eventRecord.data.id, '_blank');
+                if (eventRecord.data.check_in) {
+                    window.open(Config.apiURL + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
+                } else {
+                    window.open(Config.apiURL + "/app/sales-order/" + eventRecord.data.name, '_blank');
+                }
                 return false
             }
         },
