@@ -1,4 +1,4 @@
-let { DateHelper } = window.bryntum.scheduler;
+let { DateHelper, ResourceStore } = window.bryntum.scheduler;
 import { apiPostCall } from './SiteAPIs'
 import { searchData } from '../common/Datalayer';
 import Config from './Config'

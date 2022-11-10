@@ -141,7 +141,7 @@ export const settings = async () => {
         item.id = item.name
         item.text = item.name
     }
-    customerArray.push({ id: 'new', text: "Add New" })
+    customerArray.unshift({ id: 'new', text: "Add New Customer", eventColor : 'green' })
     window.sessionStorage.setItem('customers', JSON.stringify(customerArray))
 
     // Package

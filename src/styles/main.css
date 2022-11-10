@@ -260,3 +260,10 @@ body {
   background-color: purple !important;
   border-color: purple !important;
 }
+.b-sch-style-plain.b-sch-color-indigo .To.Deliver {
+  background-color: #ccc !important;
+  border-color: #ccc !important;
+}
+.b-textfield .b-fieldtrigger {
+  height: 37px;
+}
