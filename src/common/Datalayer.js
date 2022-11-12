@@ -160,7 +160,7 @@ export const saveData = async (event) => {
     let date = new Date()
     let data = JSON.stringify(
         {
-            "customer": event?.customer?.name,
+            "customer": event?.customer?.data?.name,
             "order_type": "Sales",
             "company": resource[0].company,
             "transaction_date": `${date.getFullYear()}-${date.getMonth() - 1}-${date.getDate()}`,

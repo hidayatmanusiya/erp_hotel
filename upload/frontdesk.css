@@ -825,6 +825,10 @@ dl dt.right img {
   color: black;
 }
 
+.b-sch-style-plain.b-sch-color-indigo {
+  background-color: #ccc !important;
+  border-color: #ccc !important;
+}
 
 .b-sch-style-plain.b-sch-color-indigo .Pre-Check.In {
   background-color: orange !important;
@@ -845,8 +849,11 @@ dl dt.right img {
   background-color: purple !important;
   border-color: purple !important;
 }
-
 .b-sch-style-plain.b-sch-color-indigo .To.Deliver {
   background-color: #ccc !important;
   border-color: #ccc !important;
 }
+.b-textfield .b-fieldtrigger {
+  height: 37px;
+}
+/*# sourceMappingURL=style.css.map*/

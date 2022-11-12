@@ -42,7 +42,7 @@ export const localTooltips = {
         titleAlign: 'start'
     },
     onBeforeShow({ source: tooltip }) {
-        tooltip.title = tooltip?.eventRecord?.customer?.customer_name ? tooltip.eventRecord.customer.customer_name : tooltip.eventRecord.customer
+        tooltip.title = tooltip?.eventRecord?.customer?.data?.name ? tooltip.eventRecord.customer.data.name : tooltip.eventRecord.customer
     },
     template: data => {
         let newData = data.eventRecord.data
@@ -55,7 +55,6 @@ export const localTooltips = {
     `
     }
 }
-
 
 export const tbar = [
     {
