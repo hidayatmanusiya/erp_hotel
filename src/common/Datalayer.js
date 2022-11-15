@@ -109,6 +109,7 @@ export const settings = async () => {
         item.id = item.name
         item.text = item.name
     }
+    contactArray.unshift({ id: 'new', text: "Add New contact", eventColor : 'green' })
     window.sessionStorage.setItem('contacts', JSON.stringify(contactArray))
 
     // Company

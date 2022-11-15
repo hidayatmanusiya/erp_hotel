@@ -259,6 +259,13 @@ export const EventEdit = {
             placeholder: 'Select Contact',
             weight: 130,
             clearable: true,
+            listeners: {
+                select: (e) => {
+                    if (e?.record?.data?.id && e?.record?.data?.id == 'new') {
+                        window.open(Config.apiURL + "/app/contact/new-contact-1", '_blank');
+                    }
+                },
+            },
         },
         packageCombo: {
             type: 'combo',
