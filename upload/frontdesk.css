@@ -587,6 +587,13 @@ dl dt.right img {
 
 .b-chipview.b-chips-closable .b-chip {
   white-space: nowrap !important;
+}
+.b-grid-row.b-group-row{
+  background: #e8efff;
+}
+.b-sch-header-timeaxis-cell{
+  white-space: inherit;
+  text-align: center;
 }body {
   min-height: 100vh;
   background-color: aquamarine;

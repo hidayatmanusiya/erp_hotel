@@ -29,3 +29,9 @@ export function apiPostCall(path, params, token) {
       // toast.error(errors.statusText);
     });
 }
+
+export async function getQueryDataApi(query) {
+  let headers = { 'Content-Type': 'application/json' }
+  let data = await axiosAPI.post('api/method/erp_custom_auth.authentication.getSqlQuery', { query }, { headers })
+  return data?.data?.message
+}

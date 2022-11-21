@@ -1,6 +1,5 @@
 let { DateHelper, ResourceStore } = window.bryntum.scheduler;
-import { apiPostCall } from './SiteAPIs'
-import { searchData } from '../common/Datalayer';
+import { searchData, feachProperty, feachRoomType } from '../common/Datalayer';
 import Config from './Config'
 let endDate = new Date()
 endDate.setDate(endDate.getDate() + 14)
@@ -9,6 +8,7 @@ export const columns = [
     {
         text: 'Status',
         field: 'status',
+        tooltip: 'Status',
         width: 20,
         region: 'left',
         htmlEncode: false,
@@ -33,8 +33,8 @@ export const columns = [
             },
         }
     },
-    { text: '', editor: null, sort: null, field: 'room_type', width: 100, region: 'left' },
-    { text: 'Room No', editor: null, field: 'room_no', width: 100, region: 'left' },
+    { text: 'Room Type', tooltip: 'Room Type', editor: null, sort: null, field: 'room_type', width: 100, region: 'left' },
+    { text: `Room No`, tooltip: 'Room No', editor: null, field: 'room_no', width: 100, region: 'left' },
 ]
 
 export const localTooltips = {
@@ -47,9 +47,11 @@ export const localTooltips = {
     template: data => {
         let newData = data.eventRecord.data
         return `<dl>
+        <dt>Contact:  <b>${newData?.contact_display ? newData?.contact_display : ''}</b></dt>
         <dt>Company:  <b>${newData?.company ? newData?.company : ''}</b></dt>
         <dt>Room NO:  <b>${newData?.room_no ? newData?.room_no : newData?.resourceId}</b></dt>
         <dt>Room Package:  <b>${newData?.room_package ? newData?.room_package?.name : newData?.room_package_cf}</b></dt>
+        <dt>Room Rate:  <b>${newData?.room_rate_cf}</b></dt>
         <dt>Check In/Out: <b>${DateHelper.format(data.eventRecord.startDate, 'ddd MM/DD')} - ${DateHelper.format(data.eventRecord.endDate, 'ddd MM/DD')}</b></dt>
     </dl>
     `
@@ -97,33 +99,10 @@ export const tbar = [
             async change({ value }) {
                 // Property
                 let filters = []
-                let propertyArray = []
                 for (let item of value) {
                     filters.push(["Property", "company", "=", item.name])
                 }
-                if (filters.length > 0) {
-                    let propertyParams = `doctype=Property&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filters)}&limit_page_length=None`;
-                    propertyArray = await apiPostCall('/', propertyParams, window.frappe?.csrf_token)
-                    for (let item of propertyArray) {
-                        item.id = item.name
-                        item.text = item.name
-                    }
-                }
-                const schedule = window.bryntum.get('scheduler');
-                const comboPropertie = schedule.tbar.items.find(element => element._ref == 'propertieCombo');
-                comboPropertie.store.data = propertyArray
-
-                // roomTypeArray
-                let roomTypeArray = []
-                let roomTypeParams = `doctype=Room+Type+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify([])}&limit_page_length=None`;
-                roomTypeArray = await apiPostCall('/', roomTypeParams, window.frappe?.csrf_token)
-                for (let item of roomTypeArray) {
-                    item.id = item.name
-                    item.text = item.name
-                }
-                const comboRoomType = schedule.tbar.items.find(element => element._ref == 'roomTypeCombo');
-                comboRoomType.store.data = roomTypeArray
-
+                feachProperty(filters)
             }
         }
     },
@@ -147,7 +126,14 @@ export const tbar = [
             }
         },
         listeners: {
-
+            async change({ value }) {
+                // RoomType
+                let filters = []
+                for (let item of value) {
+                    filters.push(["Property", "company", "=", item.name])
+                }
+                // feachRoomType(filters)
+            }
         }
     },
     {

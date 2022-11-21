@@ -96,21 +96,85 @@ export const searchData = async (params) => {
     }
     schedule.resourceStore.data = resourcesArray
     schedule.eventStore.data = events
+    window.sessionStorage.setItem('totResources', resourcesArray.lengt)
     Mask.unmask();
 }
 
-export const settings = async () => {
+export const feachProperty = async (filters) => {
     const schedule = window.bryntum.get('scheduler');
-
-    // Contact
-    let contactParams = `doctype=Contact&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
-    let contactArray = await apiPostCall('/', contactParams, window.frappe?.csrf_token)
-    for (let item of contactArray) {
+    let items = schedule.tbar.items
+    let params = `doctype=Property&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filters)}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    for (let item of dataArray) {
         item.id = item.name
         item.text = item.name
     }
-    contactArray.unshift({ id: 'new', text: "Add New contact", eventColor : 'green' })
-    window.sessionStorage.setItem('contacts', JSON.stringify(contactArray))
+    const comboPropertie = items.find(element => element._ref == 'propertieCombo');
+    comboPropertie.store.data = dataArray
+}
+
+export const feachRoomType = async (filters) => {
+    const schedule = window.bryntum.get('scheduler');
+    let items = schedule.tbar.items
+    let params = `doctype=Room+Type+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filters)}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    for (let item of dataArray) {
+        item.id = item.name
+        item.text = item.name
+    }
+    const comboPropertie = items.find(element => element._ref == 'roomTypeCombo');
+    comboPropertie.store.data = dataArray
+}
+
+export const feachRoomStatus = async (filters) => {
+    const schedule = window.bryntum.get('scheduler');
+    let items = schedule.tbar.items
+    let params = `doctype=Room+Status&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filters)}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    for (let item of dataArray) {
+        item.id = item.name
+        item.text = item.name
+    }
+    const comboPropertie = items.find(element => element._ref == 'statusCombo');
+    comboPropertie.store.data = dataArray
+}
+
+export const feachPackages = async (filters) => {
+    let params = `doctype=Item&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filters)}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    for (let item of dataArray) {
+        item.id = item.name
+        item.text = item.name
+    }
+    return dataArray
+}
+
+export const feachCustomers = async (filters) => {
+    let params = `doctype=Customer&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filters)}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    for (let item of dataArray) {
+        item.id = item.name
+        item.text = item.name
+    }
+    dataArray.unshift({ id: 'new', text: "Add New Customer", eventColor: 'green' })
+    return dataArray
+}
+
+export const feachContacts = async (filters) => {
+    let params = `doctype=Contact&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filters)}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    for (let item of dataArray) {
+        item.id = item.name
+        item.text = item.name
+    }
+    dataArray.unshift({ id: 'new', text: "Add New contact", eventColor: 'green' })
+    return dataArray
+}
+
+
+export const settings = async () => {
+    const schedule = window.bryntum.get('scheduler');
+    let items = schedule.tbar.items
 
     // Company
     let companyParams = `doctype=Company&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
@@ -119,40 +183,12 @@ export const settings = async () => {
         item.id = item.name
         item.text = item.name
     }
-    let companyCombo = schedule.tbar.items[2]
-    companyCombo.store.data = companyArray
+    const comboCompany = items.find(element => element._ref == 'companyCombo');
+    comboCompany.store.data = companyArray
 
-    // Room Status
-    let statusParams = `doctype=Room+Status&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
-    let statusArray = await apiPostCall('/', statusParams, window.frappe?.csrf_token)
-    for (let item of statusArray) {
-        item.id = item.name
-        item.text = item.name
-    }
-
-    let statusCombo = schedule.tbar.items[5]
-    statusCombo.store.data = statusArray
-    window.sessionStorage.setItem('roomStatus', JSON.stringify(statusArray))
-
-
-    // Customer
-    let customerParams = `doctype=Customer&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
-    let customerArray = await apiPostCall('/', customerParams, window.frappe?.csrf_token)
-    for (let item of customerArray) {
-        item.id = item.name
-        item.text = item.name
-    }
-    customerArray.unshift({ id: 'new', text: "Add New Customer", eventColor : 'green' })
-    window.sessionStorage.setItem('customers', JSON.stringify(customerArray))
-
-    // Package
-    let packageParams = `doctype=Item&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
-    let packageArray = await apiPostCall('/', packageParams, window.frappe?.csrf_token)
-    for (let item of packageArray) {
-        item.id = item.name
-        item.text = item.name
-    }
-    window.sessionStorage.setItem('packages', JSON.stringify(packageArray))
+    feachProperty([])
+    feachRoomType([])
+    feachRoomStatus([])
 }
 
 export const saveData = async (event) => {

@@ -28,10 +28,10 @@ export const [combo, zoomIn, zoomOut, next, previous] = WidgetHelper.append([
         ref: 'zoomInButton',
         color: 'b-blue b-raised',
         icon: 'b-icon b-icon-search-plus',
-        tooltip: 'Zoom in',
+        tooltip: 'Day',
         onClick() {
             let schedule = window.bryntum.get('scheduler');
-            schedule.zoomIn();
+            schedule.schedulerEngine.viewPreset = 'weekAndDay';
         }
     },
     {
@@ -39,7 +39,18 @@ export const [combo, zoomIn, zoomOut, next, previous] = WidgetHelper.append([
         ref: 'zoomOutButton',
         color: 'b-blue b-raised',
         icon: 'b-icon b-icon-search-minus',
-        tooltip: 'Zoom out',
+        tooltip: 'Week',
+        onClick() {
+            let schedule = window.bryntum.get('scheduler');
+            schedule.schedulerEngine.viewPreset = 'week';
+        }
+    },
+    {
+        type: 'button',
+        ref: 'zoomOutButton',
+        color: 'b-blue b-raised',
+        icon: 'b-icon b-icon-search-minus',
+        tooltip: 'Month',
         onClick() {
             let schedule = window.bryntum.get('scheduler');
             schedule.zoomOut();

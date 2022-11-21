@@ -1,5 +1,5 @@
 import Schedule from "./Schedule";
-import { settings, searchData, saveData, myStore } from '../common/Datalayer';
+import { settings, searchData, saveData, feachCustomers, feachContacts, feachPackages } from '../common/Datalayer';
 import { columns, localTooltips, tbar, EventEdit } from '../common/Columns';
 import Config from '../common/Config'
 import Toolbar from './Toolbar'
@@ -11,6 +11,7 @@ let schedule = new Schedule({
     insertFirst: 'main',
     features: {
         // eventDragCreate: false,
+        nonWorkingTime: true,
         eventResize: false,
         eventTooltip: false,
         stickyEvents: false,
@@ -32,8 +33,8 @@ let schedule = new Schedule({
             {
                 unit: 'day',
                 align: 'center',
-                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd, DD MMM')}</div>`
-            }
+                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd DD MMM')}</div>`
+            },
         ]
     },
     eventLayout: 'none',
@@ -49,17 +50,20 @@ let schedule = new Schedule({
                 return false
             }
         },
-        beforeEventEditShow({ eventRecord, editor }) {
+        async beforeEventEditShow({ eventRecord, editor }) {
             editor.title = (eventRecord.data.idx == 0) ? `Modifier ${eventRecord.name || ''}` : 'New Booking';
-            let customers = JSON.parse(window.sessionStorage.getItem('customers'))
-            let customersCombo = editor.items[0]
+
+            let customers = await feachCustomers({})
+            let customersCombo = editor.items.find(element => element._ref == 'customerCombo');
             customersCombo.store.data = customers
-            let contacts = JSON.parse(window.sessionStorage.getItem('contacts'))
-            let contactsCombo = editor.items[1]
+
+            let contacts = await feachContacts({})
+            let contactsCombo = editor.items.find(element => element._ref == 'contactsCombo');
             contactsCombo.store.data = contacts
-            let packages = JSON.parse(window.sessionStorage.getItem('packages'))
-            let packagesCombo = editor.items[2]
-            packagesCombo.store.data = packages
+
+            let packages = await feachPackages({})
+            let packageCombo = editor.items.find(element => element._ref == 'packageCombo');
+            packageCombo.store.data = packages
 
         },
         afterEventSave({ eventEdit, eventRecord }) {
