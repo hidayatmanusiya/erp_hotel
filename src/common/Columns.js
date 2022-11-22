@@ -34,7 +34,7 @@ export const columns = [
         }
     },
     { text: 'Room Type', tooltip: 'Room Type', editor: null, sort: null, field: 'room_type', width: 100, region: 'left' },
-    { text: `Room No`, tooltip: 'Room No', editor: null, field: 'room_no', width: 100, region: 'left' },
+    { text: `Room No`, id: "room_column", tooltip: 'Room No', editor: null, field: 'room_no', width: 100, region: 'left' },
 ]
 
 export const localTooltips = {

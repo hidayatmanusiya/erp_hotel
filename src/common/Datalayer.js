@@ -28,7 +28,7 @@ export const searchData = async (params) => {
     for (let item of params.status) {
         filtersR.push(["Room HMS", "status", "=", item.name])
     }
-    let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
+    let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
     let resourcesArray = await apiPostCall('/', paramsR, window.frappe?.csrf_token)
     for (let item of resourcesArray) {
         item.id = item.name
@@ -51,12 +51,12 @@ export const searchData = async (params) => {
     if (params.startDate && params.endDate) {
         let date = new Date(params.startDate)
         let fromDate = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
-        filtersE.push(["Room Folio HMS", "check_in", ">=", fromDate])
-        filtersS.push(["Sales Order", "check_in_cf", ">=", fromDate])
+        // filtersE.push(["Room Folio HMS", "check_in", ">=", fromDate])
+        // filtersS.push(["Sales Order", "check_in_cf", ">=", fromDate])
         let date1 = new Date(params.endDate)
         let fromDate1 = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
-        filtersE.push(["Room Folio HMS", "check_out", "<=", fromDate1])
-        filtersS.push(["Sales Order", "check_out_cf", "<=", fromDate1])
+        // filtersE.push(["Room Folio HMS", "check_out", "<=", fromDate1])
+        // filtersS.push(["Sales Order", "check_out_cf", "<=", fromDate1])
 
         schedule.startDate = new Date(params.startDate)
         schedule.endDate = new Date(params.endDate)
@@ -67,9 +67,9 @@ export const searchData = async (params) => {
         schedule.endDate = new Date(endDate)
     }
 
-    let paramsE = `doctype=Room+Folio+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
+    let paramsE = `doctype=Room+Folio+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
     let eventsArray = await apiPostCall('/', paramsE, window.frappe?.csrf_token)
-    let paramsS = `doctype=Sales+Order&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
+    let paramsS = `doctype=Sales+Order&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
     let eventsArrayS = await apiPostCall('/', paramsS, window.frappe?.csrf_token)
     let events = []
     let tempEventIds = {}
@@ -96,7 +96,8 @@ export const searchData = async (params) => {
     }
     schedule.resourceStore.data = resourcesArray
     schedule.eventStore.data = events
-    window.sessionStorage.setItem('totResources', resourcesArray.lengt)
+    schedule.columns.getById('room_column').text = `Room No (${resourcesArray.length})`
+    schedule.columns.getById('room_column').tooltip = `Room No (${resourcesArray.length})`
     Mask.unmask();
 }
 
