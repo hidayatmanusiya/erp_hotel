@@ -10,9 +10,6 @@ export const searchData = async (params) => {
     });
     const schedule = window.bryntum.get('scheduler');
 
-    if (window.frappe?.csrf_token == 'None') {
-        location.replace(`${window.location.origin}/login`)
-    }
 
     // Room HMS
     let filtersR = []
@@ -157,7 +154,6 @@ export const feachCustomers = async (filters) => {
         item.id = item.name
         item.text = item.name
     }
-    dataArray.unshift({ id: 'new', text: "Add New Customer", eventColor: 'green' })
     return dataArray
 }
 
@@ -168,28 +164,51 @@ export const feachContacts = async (filters) => {
         item.id = item.name
         item.text = item.name
     }
-    dataArray.unshift({ id: 'new', text: "Add New contact", eventColor: 'green' })
     return dataArray
 }
 
-
-export const settings = async () => {
+export const feachCompanys = async (filters) => {
     const schedule = window.bryntum.get('scheduler');
     let items = schedule.tbar.items
 
-    // Company
-    let companyParams = `doctype=Company&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&limit_page_length=None`;
-    let companyArray = await apiPostCall('/', companyParams, window.frappe?.csrf_token)
-    for (let item of companyArray) {
+    let params = `doctype=Company&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filters)}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    for (let item of dataArray) {
         item.id = item.name
-        item.text = item.name
+        item.text = item.company_shrot_name ? item.company_shrot_name : item.name
     }
     const comboCompany = items.find(element => element._ref == 'companyCombo');
-    comboCompany.store.data = companyArray
+    comboCompany.store.data = dataArray
+}
 
-    feachProperty([])
-    feachRoomType([])
-    feachRoomStatus([])
+export const settings = async () => {
+
+    if (window.frappe?.csrf_token == 'None') {
+        location.replace(`${window.location.origin}/login`)
+    }
+
+    await feachCompanys([])
+    await feachProperty([])
+    await feachRoomType([])
+    await feachRoomStatus([])
+
+    const schedule = window.bryntum.get('scheduler');
+    let items = schedule.tbar.items
+
+    let company = ''
+    let property = ''
+    let params = `doctype=HMS+Setting&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify([])}&limit_page_length=None`;
+    let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+    if (dataArray && dataArray[0]) {
+        company = dataArray[0]['company']
+        const selCompany = items.find(element => element._ref == 'companyCombo');
+        selCompany.value = company
+
+        property = dataArray[0]['property']
+        const selPropertie = items.find(element => element._ref == 'propertieCombo');
+        selPropertie.value = property
+    }
+    searchData({ startDate: null, endDate: null, company: [{ name: company }], propertie: [property], roomType: [], status: [] })
 }
 
 export const saveData = async (event) => {

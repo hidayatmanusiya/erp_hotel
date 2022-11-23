@@ -1,10 +1,11 @@
 import SharedToolbar from "./SharedToolbar";
 import { presetStore } from "./Presets";
+import { feachContacts } from "../common/Datalayer";
 
 let { WidgetHelper } = window.bryntum.scheduler;
 new SharedToolbar();
 
-export const [combo, zoomIn, zoomOut, next, previous] = WidgetHelper.append([
+export const [combo, today, week, month, next, previous, customers, customerLists] = WidgetHelper.append([
     {
         type: 'combo',
         width: 200,
@@ -74,6 +75,42 @@ export const [combo, zoomIn, zoomOut, next, previous] = WidgetHelper.append([
         onAction() {
             let schedule = window.bryntum.get('scheduler');
             schedule.shiftPrevious();
+        }
+    },
+    {
+        type: 'textfield',
+        ref: 'filterCustomers',
+        icon: 'b-fa b-fa-filter',
+        cls: 'b-bright',
+        style: 'margin-left: 130px;',
+        placeholder: 'Find Customers',
+        clearable: true,
+        keyStrokeChangeDelay: 100,
+        triggers: {
+            filter: {
+                align: 'start',
+                cls: 'b-fa b-fa-filter'
+            }
+        },
+        listeners: {
+            change: async ({ value }) => {
+                if (value) {
+                    let data = await feachContacts([["Contact", "name", "like", `%${value}%`]])
+                    customerLists.store.data = data
+                }
+            }
+        }
+    },
+    {
+        type: 'list',
+        ref: 'listCustomers',
+        cls: 'customer-list',
+        itemTpl: item => `<i>${item.name}</i>`,
+        items: [],
+        onItem({ record }) {
+            window.open(`${window.location.origin}/query-report/Guest%20History%20HMS?guest=${record.data}&date=today`, '_blank')
+            customerLists.store.data = []
+            customers.value = null
         }
     }
 

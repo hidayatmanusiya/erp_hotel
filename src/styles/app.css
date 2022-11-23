@@ -90,10 +90,30 @@ dl dt.right img {
 .b-chipview.b-chips-closable .b-chip {
   white-space: nowrap !important;
 }
-.b-grid-row.b-group-row{
-  background: #e8efff;
+
+.b-grid-row.b-group-row {
+  background: #e8efff!important
 }
-.b-sch-header-timeaxis-cell{
+
+.b-sch-header-timeaxis-cell {
   white-space: inherit;
   text-align: center;
+}
+
+#tools {
+  position: relative;
+}
+
+#tools .customer-list {
+  position: absolute;
+  top: 43px;
+  z-index: 99;
+  background: transparent;
+  left: 123px;
+  height: 160px;
+  overflow-y: scroll;
+}
+
+#tools .b-list-item {
+  background: #fff;
 }

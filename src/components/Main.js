@@ -54,10 +54,12 @@ let schedule = new Schedule({
             editor.title = (eventRecord.data.idx == 0) ? `Modifier ${eventRecord.name || ''}` : 'New Booking';
 
             let customers = await feachCustomers({})
+            customers.unshift({ id: 'new', text: "Add New Customer", eventColor: 'green' })
             let customersCombo = editor.items.find(element => element._ref == 'customerCombo');
             customersCombo.store.data = customers
 
             let contacts = await feachContacts({})
+            contacts.unshift({ id: 'new', text: "Add New contact", eventColor: 'green' })
             let contactsCombo = editor.items.find(element => element._ref == 'contactsCombo');
             contactsCombo.store.data = contacts
 
@@ -79,6 +81,5 @@ let schedule = new Schedule({
 });
 
 setTimeout(() => {
-    searchData({ startDate: null, endDate: null, company: [], propertie: [], roomType: [], status: [] })
     settings()
 }, 1000);
