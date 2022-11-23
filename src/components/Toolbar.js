@@ -32,7 +32,10 @@ export const [combo, today, week, month, next, previous, customers, customerList
         tooltip: 'Today',
         onClick() {
             let schedule = window.bryntum.get('scheduler');
-            schedule.zoomToLevel('hourAndDay');
+            schedule.setType = 'day'
+            let endDate = new Date(schedule.startDate)
+            endDate.setDate(endDate.getDate() + 1)
+            schedule.endDate = endDate
         }
     },
     {
@@ -43,7 +46,10 @@ export const [combo, today, week, month, next, previous, customers, customerList
         tooltip: 'Week',
         onClick() {
             let schedule = window.bryntum.get('scheduler');
-            schedule.zoomToLevel('weekAndDay');
+            schedule.setType = 'week'
+            let endDate = new Date(schedule.startDate)
+            endDate.setDate(endDate.getDate() + 7)
+            schedule.endDate = endDate
         }
     },
     {
@@ -54,7 +60,10 @@ export const [combo, today, week, month, next, previous, customers, customerList
         tooltip: 'Month',
         onClick() {
             let schedule = window.bryntum.get('scheduler');
-            schedule.zoomToLevel('weekAndMonth');
+            schedule.setType = 'month'
+            let endDate = new Date(schedule.startDate)
+            endDate.setDate(endDate.getDate() + 30)
+            schedule.endDate = endDate
         }
     },
     {
@@ -64,7 +73,15 @@ export const [combo, today, week, month, next, previous, customers, customerList
         tooltip: 'View next day',
         onAction() {
             let schedule = window.bryntum.get('scheduler');
-            schedule.shiftNext();
+            let startDate = new Date(schedule.startDate)
+            startDate.setDate(startDate.getDate() + 1)
+            schedule.startDate = startDate
+            let endDate = new Date(schedule.endDate)
+            endDate.setDate(endDate.getDate() + 1)
+            schedule.endDate = endDate
+            let items = schedule.tbar.items
+            const selDate = items.find(element => element._ref == 'startDate');
+            selDate.value = startDate
         }
     },
     {
@@ -74,7 +91,15 @@ export const [combo, today, week, month, next, previous, customers, customerList
         tooltip: 'View previous day',
         onAction() {
             let schedule = window.bryntum.get('scheduler');
-            schedule.shiftPrevious();
+            let startDate = new Date(schedule.startDate)
+            startDate.setDate(startDate.getDate() - 1)
+            schedule.startDate = startDate
+            let endDate = new Date(schedule.endDate)
+            endDate.setDate(endDate.getDate() - 1)
+            schedule.endDate = endDate
+            let items = schedule.tbar.items
+            const selDate = items.find(element => element._ref == 'startDate');
+            selDate.value = startDate
         }
     },
     {

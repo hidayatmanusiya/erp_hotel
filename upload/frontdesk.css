@@ -590,7 +590,7 @@ dl dt.right img {
 }
 
 .b-grid-row.b-group-row {
-  background: #e8efff;
+  background: #e8efff!important
 }
 
 .b-sch-header-timeaxis-cell {

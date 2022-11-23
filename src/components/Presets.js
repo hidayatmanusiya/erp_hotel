@@ -1,6 +1,5 @@
 let { PresetManager, PresetStore } = window.bryntum.scheduler;
 export const requiredPresetIds = {
-    //secondAndMinute: 1,
     minuteAndHour: 1,
     hourAndDay: 1,
     dayNightShift: 1,
@@ -10,7 +9,6 @@ export const requiredPresetIds = {
     weekDateAndMonth: 1,
     monthAndYear: 1,
     year: 1
-    //manyYears: 1
 };
 
 // Create a presets store with just the ones we want.

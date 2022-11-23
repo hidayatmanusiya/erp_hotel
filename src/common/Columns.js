@@ -67,15 +67,24 @@ export const tbar = [
         weight: 50,
         placeholder: 'Start Date',
         clearable: true,
-    },
-    {
-        type: 'DateField',
-        ref: 'endDate',
-        name: 'end_date',
-        value: endDate,
-        weight: 50,
-        placeholder: 'End Date',
-        clearable: true,
+        listeners: {
+            async change({ value }) {
+                let startDate = new Date(value)
+                let schedule = window.bryntum.get('scheduler');
+                let endDate = new Date(value)
+                if (schedule.setType == 'day') {
+                    endDate.setDate(startDate.getDate() + 1)
+                }
+                if (schedule.setType == 'week') {
+                    endDate.setDate(startDate.getDate() + 7)
+                }
+                if (schedule.setType == 'month') {
+                    endDate.setDate(startDate.getDate() + 30)
+                }
+                schedule.startDate = startDate
+                schedule.endDate = endDate
+            }
+        }
     },
     {
         type: 'combo',

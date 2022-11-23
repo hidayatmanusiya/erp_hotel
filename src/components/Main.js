@@ -23,17 +23,16 @@ let schedule = new Schedule({
         eventEdit: EventEdit,
 
     },
-    // createEventOnDblClick: false,
     columns: columns,
     rowHeight: 20,
     viewPreset: {
-        base: 'dayAndWeek',
+        base: 'weekAndMonth',
         tickWidth: 10,
         headers: [
             {
                 unit: 'day',
                 align: 'center',
-                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd DD MMM')}</div>`
+                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd DD')}</div>`
             },
         ]
     },

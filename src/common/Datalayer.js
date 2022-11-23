@@ -9,64 +9,82 @@ export const searchData = async (params) => {
         mode: 'dark-blur'
     });
     const schedule = window.bryntum.get('scheduler');
+    let items = schedule.tbar.items
 
 
-    // Room HMS
+    // Room HMS & Room Folio HMS
     let filtersR = []
-    for (let item of params.company) {
-        filtersR.push(["Room HMS", "company", "=", item.name])
+    let filtersE = []
+    let filtersS = []
+
+    const selCompany = items.find(element => element._ref == 'companyCombo');
+    if (selCompany?.value) {
+        for (let item of selCompany?.value) {
+            filtersR.push(["Room HMS", "company", "=", item.name])
+            filtersE.push(["Room Folio HMS", "company", "=", item.name])
+            filtersS.push(["Sales Order", "company", "=", item.name])
+        }
     }
-    for (let item of params.roomType) {
-        filtersR.push(["Room HMS", "room_type", "=", item])
+    const selPropertie = items.find(element => element._ref == 'propertieCombo');
+    if (selPropertie?.value) {
+        for (let item of selPropertie?.value) {
+            filtersR.push(["Room HMS", "property", "=", item.name])
+            filtersE.push(["Room Folio HMS", "property", "=", item.name])
+            filtersS.push(["Sales Order", "property", "=", item.name])
+        }
     }
-    for (let item of params.propertie) {
-        filtersR.push(["Room HMS", "property", "=", item])
+    const selRoomType = items.find(element => element._ref == 'roomTypeCombo');
+    if (selRoomType?.value) {
+        for (let item of selRoomType?.value) {
+            filtersR.push(["Room HMS", "room_type", "=", item.name])
+            filtersE.push(["Room Folio HMS", "room_type", "=", item.name])
+            filtersS.push(["Sales Order", "room_type", "=", item.name])
+        }
     }
-    for (let item of params.status) {
-        filtersR.push(["Room HMS", "status", "=", item.name])
+    const selStatus = items.find(element => element._ref == 'statusCombo');
+    if (selStatus?.value) {
+        for (let item of selStatus?.value) {
+            filtersR.push(["Room HMS", "status", "=", item.name])
+        }
     }
     let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
     let resourcesArray = await apiPostCall('/', paramsR, window.frappe?.csrf_token)
     for (let item of resourcesArray) {
         item.id = item.name
     }
+
     // Room Folio HMS
-    let filtersE = []
-    let filtersS = []
-    for (let item of params.company) {
-        filtersE.push(["Room Folio HMS", "company", "=", item.name])
-        filtersS.push(["Sales Order", "company", "=", item.name])
-    }
-    for (let item of params.roomType) {
-        filtersE.push(["Room Folio HMS", "room_type", "=", item])
-        filtersS.push(["Sales Order", "room_type", "=", item])
-    }
-    for (let item of params.propertie) {
-        filtersE.push(["Room Folio HMS", "property", "=", item])
-        filtersS.push(["Sales Order", "property", "=", item])
-    }
-    if (params.startDate && params.endDate) {
-        let date = new Date(params.startDate)
-        let fromDate = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
-        // filtersE.push(["Room Folio HMS", "check_in", ">=", fromDate])
-        // filtersS.push(["Sales Order", "check_in_cf", ">=", fromDate])
-        let date1 = new Date(params.endDate)
-        let fromDate1 = `${date.getFullYear()}-${date.getMonth() < 9 ? "0" + (Number(date.getMonth()) + 1) : date.getMonth()}-${date.getDate() < 9 ? "0" + date.getDate() : date.getDate()}`
-        // filtersE.push(["Room Folio HMS", "check_out", "<=", fromDate1])
-        // filtersS.push(["Sales Order", "check_out_cf", "<=", fromDate1])
+    let filtersEAnd = []
+    let filtersSAnd = []
+    const selStartDate = items.find(element => element._ref == 'startDate');
+    const setType = schedule.setType
 
-        schedule.startDate = new Date(params.startDate)
-        schedule.endDate = new Date(params.endDate)
-    } else {
-        let endDate = new Date()
-        endDate.setDate(endDate.getDate() + 14)
-        schedule.startDate = new Date()
-        schedule.endDate = new Date(endDate)
+    if (selStartDate.value && setType) {
+        let date = new Date(selStartDate.value)
+        let month = date.getMonth() + 1
+        let fromDate = `${date.getFullYear()}-${month < 10 ? "0" + month : month}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`
+        filtersEAnd.push(["Room Folio HMS", "check_in", ">=", fromDate])
+        filtersSAnd.push(["Sales Order", "check_in_cf", ">=", fromDate])
+
+        let date1 = new Date(selStartDate.value)
+        if (setType == 'day') {
+            date1.setDate(date1.getDate() + 1)
+        }
+        if (setType == 'week') {
+            date1.setDate(date1.getDate() + 7)
+        }
+        if (setType == 'month') {
+            date1.setDate(date1.getDate() + 30)
+        }
+        let month1 = date1.getMonth() + 1
+        let fromDate1 = `${date1.getFullYear()}-${month1 < 10 ? "0" + month1 : month1}-${date1.getDate() < 10 ? "0" + date1.getDate() : date1.getDate()}`
+        filtersEAnd.push(["Room Folio HMS", "check_out", "<=", fromDate1])
+        filtersSAnd.push(["Sales Order", "check_out_cf", "<=", fromDate1])
     }
 
-    let paramsE = `doctype=Room+Folio+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
+    let paramsE = `doctype=Room+Folio+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersEAnd)}&or_filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
     let eventsArray = await apiPostCall('/', paramsE, window.frappe?.csrf_token)
-    let paramsS = `doctype=Sales+Order&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
+    let paramsS = `doctype=Sales+Order&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filtersSAnd)}&or_filters=${JSON.stringify(filtersE)}&limit_page_length=None`;
     let eventsArrayS = await apiPostCall('/', paramsS, window.frappe?.csrf_token)
     let events = []
     let tempEventIds = {}
@@ -93,6 +111,8 @@ export const searchData = async (params) => {
     }
     schedule.resourceStore.data = resourcesArray
     schedule.eventStore.data = events
+    // console.log(resourcesArray)
+    // console.log(events)
     schedule.columns.getById('room_column').text = `Room No (${resourcesArray.length})`
     schedule.columns.getById('room_column').tooltip = `Room No (${resourcesArray.length})`
     Mask.unmask();
@@ -194,6 +214,12 @@ export const settings = async () => {
 
     const schedule = window.bryntum.get('scheduler');
     let items = schedule.tbar.items
+
+    let endDate = new Date()
+    endDate.setDate(endDate.getDate() + 7)
+    schedule.startDate = new Date()
+    schedule.endDate = new Date(endDate)
+    schedule.setType = 'week'
 
     let company = ''
     let property = ''
