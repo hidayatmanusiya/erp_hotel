@@ -1,8 +1,9 @@
 import { apiPostCall } from './SiteAPIs'
 import Config from './Config'
+import { cusDate } from '../components/Toolbar';
 const { Mask } = window.bryntum.scheduler;
 
-export const searchData = async (params) => {
+export const searchData = async () => {
 
     Mask.mask({
         text: 'Loading Data ...',
@@ -41,12 +42,12 @@ export const searchData = async (params) => {
             filtersS.push(["Sales Order", "room_type", "=", item.name])
         }
     }
-    const selStatus = items.find(element => element._ref == 'statusCombo');
-    if (selStatus?.value) {
-        for (let item of selStatus?.value) {
-            filtersR.push(["Room HMS", "status", "=", item.name])
-        }
-    }
+    // const selStatus = items.find(element => element._ref == 'statusCombo');
+    // if (selStatus?.value) {
+    //     for (let item of selStatus?.value) {
+    //         filtersR.push(["Room HMS", "status", "=", item.name])
+    //     }
+    // }
     let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
     let resourcesArray = await apiPostCall('/', paramsR, window.frappe?.csrf_token)
     for (let item of resourcesArray) {
@@ -56,17 +57,17 @@ export const searchData = async (params) => {
     // Room Folio HMS
     let filtersEAnd = []
     let filtersSAnd = []
-    const selStartDate = items.find(element => element._ref == 'startDate');
+
     const setType = schedule.setType
 
-    if (selStartDate.value && setType) {
-        let date = new Date(selStartDate.value)
+    if (cusDate.value.value && setType) {
+        let date = new Date(cusDate.value)
         let month = date.getMonth() + 1
         let fromDate = `${date.getFullYear()}-${month < 10 ? "0" + month : month}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`
         filtersEAnd.push(["Room Folio HMS", "check_in", ">=", fromDate])
         filtersSAnd.push(["Sales Order", "check_in_cf", ">=", fromDate])
 
-        let date1 = new Date(selStartDate.value)
+        let date1 = new Date(cusDate.value)
         if (setType == 'day') {
             date1.setDate(date1.getDate() + 1)
         }
@@ -210,7 +211,7 @@ export const settings = async () => {
     await feachCompanys([])
     await feachProperty([])
     await feachRoomType([])
-    await feachRoomStatus([])
+    // await feachRoomStatus([])
 
     const schedule = window.bryntum.get('scheduler');
     let items = schedule.tbar.items
@@ -234,7 +235,7 @@ export const settings = async () => {
         const selPropertie = items.find(element => element._ref == 'propertieCombo');
         selPropertie.value = property
     }
-    searchData({ startDate: null, endDate: null, company: [{ name: company }], propertie: [property], roomType: [], status: [] })
+    searchData()
 }
 
 export const saveData = async (event) => {

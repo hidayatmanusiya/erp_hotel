@@ -27,12 +27,12 @@ let schedule = new Schedule({
     rowHeight: 20,
     viewPreset: {
         base: 'weekAndMonth',
-        tickWidth: 10,
+        tickWidth: 5,
         headers: [
             {
                 unit: 'day',
                 align: 'center',
-                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd DD')}</div>`
+                renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd')} <br />${DateHelper.format(startDate, 'DD')}</div>`
             },
         ]
     },

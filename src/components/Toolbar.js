@@ -1,11 +1,44 @@
 import SharedToolbar from "./SharedToolbar";
 import { presetStore } from "./Presets";
-import { feachContacts } from "../common/Datalayer";
+import { searchData } from "../common/Datalayer";
 
-let { WidgetHelper } = window.bryntum.scheduler;
+let { WidgetHelper, Menu } = window.bryntum.scheduler;
 new SharedToolbar();
 
-export const [combo, today, week, month, next, previous, customers, customerLists] = WidgetHelper.append([
+const menu = new Menu({
+    anchor: true,
+    autoShow: false,
+    items: [
+        {
+            icon: 'b-icon b-fa b-fa-circle',
+            text: 'Menu 1'
+        },
+        {
+            icon: 'b-icon b-fa b-fa-circle',
+            text: 'Menu 1'
+        },
+        {
+            icon: 'b-icon b-fa b-fa-circle',
+            text: 'Menu 1'
+        },
+        {
+            icon: 'b-icon b-fa b-fa-circle',
+            text: 'Menu 1'
+        },
+    ],
+    onItem({ item }) {
+        console.log(item)
+        window.open(`${window.location.origin}/query-report/Guest%20History%20HMS?guest=${item}&date=today`, '_blank')
+    }
+});
+export const [menuItem, combo, today, week, month, next, previous, cusDate] = WidgetHelper.append([
+    {
+        type: 'button',
+        icon: 'b-icon b-fa b-fa-bars',
+        color: 'b-blue b-raised',
+        tooltip: 'View previous day',
+        menu,
+    },
     {
         type: 'combo',
         width: 200,
@@ -22,6 +55,7 @@ export const [combo, today, week, month, next, previous, customers, customerList
         onChange: () => {
             let schedule = window.bryntum.get('scheduler');
             schedule.zoomToLevel(combo.selected);
+            setTimeout(() => searchData(), 10)
         }
     },
     {
@@ -36,6 +70,7 @@ export const [combo, today, week, month, next, previous, customers, customerList
             let endDate = new Date(schedule.startDate)
             endDate.setDate(endDate.getDate() + 1)
             schedule.endDate = endDate
+            setTimeout(() => searchData(), 10)
         }
     },
     {
@@ -50,6 +85,7 @@ export const [combo, today, week, month, next, previous, customers, customerList
             let endDate = new Date(schedule.startDate)
             endDate.setDate(endDate.getDate() + 7)
             schedule.endDate = endDate
+            setTimeout(() => searchData(), 10)
         }
     },
     {
@@ -64,6 +100,7 @@ export const [combo, today, week, month, next, previous, customers, customerList
             let endDate = new Date(schedule.startDate)
             endDate.setDate(endDate.getDate() + 30)
             schedule.endDate = endDate
+            setTimeout(() => searchData(), 10)
         }
     },
     {
@@ -79,9 +116,7 @@ export const [combo, today, week, month, next, previous, customers, customerList
             let endDate = new Date(schedule.endDate)
             endDate.setDate(endDate.getDate() + 1)
             schedule.endDate = endDate
-            let items = schedule.tbar.items
-            const selDate = items.find(element => element._ref == 'startDate');
-            selDate.value = startDate
+            cusDate.value = startDate
         }
     },
     {
@@ -97,46 +132,34 @@ export const [combo, today, week, month, next, previous, customers, customerList
             let endDate = new Date(schedule.endDate)
             endDate.setDate(endDate.getDate() - 1)
             schedule.endDate = endDate
-            let items = schedule.tbar.items
-            const selDate = items.find(element => element._ref == 'startDate');
-            selDate.value = startDate
+            cusDate.value = startDate
         }
     },
     {
-        type: 'textfield',
-        ref: 'filterCustomers',
-        icon: 'b-fa b-fa-filter',
-        cls: 'b-bright',
-        style: 'margin-left: 130px;',
-        placeholder: 'Find Customers',
-        clearable: true,
-        keyStrokeChangeDelay: 100,
-        triggers: {
-            filter: {
-                align: 'start',
-                cls: 'b-fa b-fa-filter'
-            }
-        },
+        type: 'DateField',
+        ref: 'startDate',
+        name: 'start_date',
+        value: new Date(),
+        weight: 50,
+        placeholder: 'Start Date',
         listeners: {
-            change: async ({ value }) => {
-                if (value) {
-                    let data = await feachContacts([["Contact", "name", "like", `%${value}%`]])
-                    customerLists.store.data = data
+            async change({ value }) {
+                let startDate = new Date(value)
+                let schedule = window.bryntum.get('scheduler');
+                let endDate = new Date(value)
+                if (schedule.setType == 'day') {
+                    endDate.setDate(startDate.getDate() + 1)
                 }
+                if (schedule.setType == 'week') {
+                    endDate.setDate(startDate.getDate() + 7)
+                }
+                if (schedule.setType == 'month') {
+                    endDate.setDate(startDate.getDate() + 30)
+                }
+                schedule.startDate = startDate
+                schedule.endDate = endDate
+                setTimeout(() => searchData(), 10)
             }
         }
     },
-    {
-        type: 'list',
-        ref: 'listCustomers',
-        cls: 'customer-list',
-        itemTpl: item => `<i>${item.name}</i>`,
-        items: [],
-        onItem({ record }) {
-            window.open(`${window.location.origin}/query-report/Guest%20History%20HMS?guest=${record.data}&date=today`, '_blank')
-            customerLists.store.data = []
-            customers.value = null
-        }
-    }
-
 ], { insertFirst: document.getElementById('tools') || document.body });

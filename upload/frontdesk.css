@@ -510,7 +510,7 @@ body.b-size-phone #container::after {
 }
 
 .b-grid-header {
-  height: 57px;
+  height: 40px;
 }
 
 .b-unassigned-class.b-drag-proxy {
@@ -590,7 +590,7 @@ dl dt.right img {
 }
 
 .b-grid-row.b-group-row {
-  background: #e8efff!important
+  background: #e8efff !important
 }
 
 .b-sch-header-timeaxis-cell {
@@ -598,22 +598,34 @@ dl dt.right img {
   text-align: center;
 }
 
-#tools {
+.b-hbox {
   position: relative;
+  overflow: visible;
 }
 
-#tools .customer-list {
+.b-hbox .customer-list {
   position: absolute;
-  top: 43px;
+  top: 38px;
   z-index: 99;
   background: transparent;
-  left: 123px;
+  left: 10px;
   height: 160px;
   overflow-y: scroll;
 }
 
-#tools .b-list-item {
+.b-hbox .b-list-item {
   background: #fff;
+}
+
+.b-hbox .customer-list .date-view {}
+
+.b-textfield {
+  height: 30px;
+}
+
+.b-toolbar.b-dock-top,
+.b-toolbar.b-dock-bottom {
+  min-height: 2.2em;
 }body {
   min-height: 100vh;
   background-color: aquamarine;
@@ -628,7 +640,7 @@ dl dt.right img {
 .main-header {
   display: flex;
   color: #fff;
-  padding: 1em 0;
+  padding: 0.5em 0;
   transition: background-color .5s, padding .5s, font-size .1s;
   background-color: #0f172b;
   flex: 0 0 auto;
@@ -882,5 +894,8 @@ dl dt.right img {
 }
 .b-textfield .b-fieldtrigger {
   height: 37px;
+}
+.b-button{
+  min-height: 2em;
 }
 /*# sourceMappingURL=style.css.map*/

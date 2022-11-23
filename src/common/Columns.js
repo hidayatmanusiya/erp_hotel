@@ -1,5 +1,5 @@
 let { DateHelper, ResourceStore } = window.bryntum.scheduler;
-import { searchData, feachProperty, feachRoomType } from '../common/Datalayer';
+import { searchData, feachProperty, feachRoomType, feachContacts } from '../common/Datalayer';
 import Config from './Config'
 let endDate = new Date()
 endDate.setDate(endDate.getDate() + 14)
@@ -60,30 +60,46 @@ export const localTooltips = {
 
 export const tbar = [
     {
-        type: 'DateField',
-        ref: 'startDate',
-        name: 'start_date',
-        value: new Date(),
+        type: 'textfield',
+        ref: 'filterCustomers',
+        icon: 'b-fa b-fa-filter',
+        cls: 'b-bright',
         weight: 50,
-        placeholder: 'Start Date',
+        placeholder: 'Find Customers',
         clearable: true,
-        listeners: {
-            async change({ value }) {
-                let startDate = new Date(value)
-                let schedule = window.bryntum.get('scheduler');
-                let endDate = new Date(value)
-                if (schedule.setType == 'day') {
-                    endDate.setDate(startDate.getDate() + 1)
-                }
-                if (schedule.setType == 'week') {
-                    endDate.setDate(startDate.getDate() + 7)
-                }
-                if (schedule.setType == 'month') {
-                    endDate.setDate(startDate.getDate() + 30)
-                }
-                schedule.startDate = startDate
-                schedule.endDate = endDate
+        keyStrokeChangeDelay: 100,
+        triggers: {
+            filter: {
+                align: 'start',
+                cls: 'b-fa b-fa-filter'
             }
+        },
+        listeners: {
+            change: async ({ value }) => {
+                if (value) {
+                    let data = await feachContacts([["Contact", "name", "like", `%${value}%`]])
+                    const schedule = window.bryntum.get('scheduler');
+                    let items = schedule.tbar.items
+                    const selList = items.find(element => element._ref == 'listCustomers');
+                    selList.store.data = data
+                }
+            }
+        }
+    },
+    {
+        type: 'list',
+        ref: 'listCustomers',
+        cls: 'customer-list',
+        itemTpl: item => `<i>${item.name}</i>`,
+        items: [],
+        onItem({ record }) {
+            window.open(`${window.location.origin}/query-report/Guest%20History%20HMS?guest=${record.data}&date=today`, '_blank')
+            const schedule = window.bryntum.get('scheduler');
+            let items = schedule.tbar.items
+            const selList = items.find(element => element._ref == 'listCustomers');
+            selList.store.data = []
+            const selFilter = items.find(element => element._ref == 'filterCustomers');
+            selFilter.value = null
         }
     },
     {
@@ -112,6 +128,7 @@ export const tbar = [
                     filters.push(["Property", "company", "=", item.name])
                 }
                 feachProperty(filters)
+                setTimeout(() => searchData(), 10)
             }
         }
     },
@@ -142,6 +159,7 @@ export const tbar = [
                     filters.push(["Property", "company", "=", item.name])
                 }
                 // feachRoomType(filters)
+                setTimeout(() => searchData(), 10)
             }
         }
     },
@@ -164,56 +182,58 @@ export const tbar = [
             }
         },
         listeners: {
-
+            async change() {
+                setTimeout(() => searchData(), 10)
+            }
         }
     },
-    {
-        type: 'combo',
-        ref: 'statusCombo',
-        name: 'status',
-        weight: 50,
-        multiSelect: true,
-        placeholder: 'Select Status',
-        clearable: true,
-        chipView: {
-            scrollable: {
-                overflowY: false,
-                overflowX: 'hidden-scroll'
-            },
-            style: {
-                flexFlow: 'nowrap',
-                fontSize: 12
-            }
-        },
-        listeners: {
+    // {
+    //     type: 'combo',
+    //     ref: 'statusCombo',
+    //     name: 'status',
+    //     weight: 50,
+    //     multiSelect: true,
+    //     placeholder: 'Select Status',
+    //     clearable: true,
+    //     chipView: {
+    //         scrollable: {
+    //             overflowY: false,
+    //             overflowX: 'hidden-scroll'
+    //         },
+    //         style: {
+    //             flexFlow: 'nowrap',
+    //             fontSize: 12
+    //         }
+    //     },
+    //     listeners: {
 
-        }
-    },
-    {
-        type: 'button',
-        cls: 'b-raised',
-        icon: 'b-fa-search',
-        color: 'green',
-        onClick: () => {
-            const schedule = window.bryntum.get('scheduler');
-            let searchItems = schedule.tbar.items
-            let startDate = searchItems[0]?.value
-            let endDate = searchItems[1]?.value
-            let company = searchItems[2]?.value
-            let properties = searchItems[3]?.value ? searchItems[3]?.value : []
-            let propertie = []
-            for (let item of properties) {
-                propertie.push(item.data.name)
-            }
-            let roomTypes = searchItems[4]?.value ? searchItems[4]?.value : []
-            let roomType = []
-            for (let item of roomTypes) {
-                roomType.push(item.data.name)
-            }
-            let status = searchItems[5]?.value
-            searchData({ startDate, endDate, company, propertie, roomType, status })
-        }
-    }
+    //     }
+    // },
+    // {
+    //     type: 'button',
+    //     cls: 'b-raised',
+    //     icon: 'b-fa-search',
+    //     color: 'green',
+    //     onClick: () => {
+    //         const schedule = window.bryntum.get('scheduler');
+    //         let searchItems = schedule.tbar.items
+    //         let startDate = searchItems[0]?.value
+    //         let endDate = searchItems[1]?.value
+    //         let company = searchItems[2]?.value
+    //         let properties = searchItems[3]?.value ? searchItems[3]?.value : []
+    //         let propertie = []
+    //         for (let item of properties) {
+    //             propertie.push(item.data.name)
+    //         }
+    //         let roomTypes = searchItems[4]?.value ? searchItems[4]?.value : []
+    //         let roomType = []
+    //         for (let item of roomTypes) {
+    //             roomType.push(item.data.name)
+    //         }
+    //         let status = searchItems[5]?.value
+    //         searchData({ startDate, endDate, company, propertie, roomType, status })
+    //     }
+    // }
 ]
 
 export const EventEdit = {
