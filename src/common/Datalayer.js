@@ -112,8 +112,6 @@ export const searchData = async () => {
     }
     schedule.resourceStore.data = resourcesArray
     schedule.eventStore.data = events
-    // console.log(resourcesArray)
-    // console.log(events)
     schedule.columns.getById('room_column').text = `Room No (${resourcesArray.length})`
     schedule.columns.getById('room_column').tooltip = `Room No (${resourcesArray.length})`
     Mask.unmask();
@@ -259,7 +257,6 @@ export const saveData = async (event) => {
             "check_out_cf": Config.formatTime(event.endDate),
             "room_type_cf": resource[0].room_type,
             "room_package_cf": event.room_package.name,
-            // "property": event.room_package.name,
             "number_of_room": event.rooms,
             "room_no": resource[0].name,
             "status": "Draft",

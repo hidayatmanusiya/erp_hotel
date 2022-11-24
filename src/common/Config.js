@@ -1,6 +1,8 @@
 export default {
     siteUrl: process.env.REACT_APP_ENV == 'dev' ? 'https://hotel.bizmap.in' : window.location.origin,
     siteToken: 'token c2609de4fbfd645:a37f3ea3eac89f3',
+    // siteUrl: process.env.REACT_APP_ENV == 'dev' ? 'https://hoteldev.bizmap.in' : window.location.origin,
+    // siteToken: 'token 2312f6ffdeb36cf:008977011f9e89e',
     formatTime: (date) => {
         const newDate = new Date(date);
         let month = newDate.getMonth() + 1
