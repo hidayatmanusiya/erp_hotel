@@ -600,7 +600,11 @@ dl dt.right img {
 
 .b-hbox {
   position: relative;
-  overflow: visible;
+  overflow: visible!important;
+}
+
+.b-hbox .customer-search {
+  margin-right: 100px !important;
 }
 
 .b-hbox .customer-list {
@@ -617,8 +621,6 @@ dl dt.right img {
   background: #fff;
 }
 
-.b-hbox .customer-list .date-view {}
-
 .b-textfield {
   height: 30px;
 }
@@ -626,6 +628,14 @@ dl dt.right img {
 .b-toolbar.b-dock-top,
 .b-toolbar.b-dock-bottom {
   min-height: 2.2em;
+}
+
+.b-button {
+  min-height: 30px !important;
+}
+
+.b-button label {
+  margin: 0 !important;
 }body {
   min-height: 100vh;
   background-color: aquamarine;

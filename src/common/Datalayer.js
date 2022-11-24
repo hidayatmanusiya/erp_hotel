@@ -205,7 +205,7 @@ export const feachCompanys = async (filters) => {
 export const settings = async () => {
 
     if (window.frappe?.csrf_token == 'None') {
-        location.replace(`${window.location.origin}/login`)
+        location.replace(`${Config.siteUrl}/login`)
     }
 
     await feachCompanys([])
@@ -248,7 +248,7 @@ export const saveData = async (event) => {
             "order_type": "Sales",
             "company": resource[0].company,
             "transaction_date": `${date.getFullYear()}-${date.getMonth() - 1}-${date.getDate()}`,
-            "guest_cf": event?.contact?.name,
+            "guest_cf": event?.contact?.data?.name,
             "currency": "INR",
             "conversion_rate": 1,
             "selling_price_list": "Standard Selling",
@@ -260,6 +260,7 @@ export const saveData = async (event) => {
             "room_type_cf": resource[0].room_type,
             "room_package_cf": event.room_package.name,
             // "property": event.room_package.name,
+            "number_of_room": event.rooms,
             "room_no": resource[0].name,
             "status": "Draft",
             "items": [
@@ -273,4 +274,5 @@ export const saveData = async (event) => {
         }
     );
     let bookRoom = await apiPostCall('/api/resource/Sales Order', data, window.frappe?.csrf_token)
+    searchData()
 }

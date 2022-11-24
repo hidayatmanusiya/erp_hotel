@@ -1,7 +1,7 @@
 import SharedToolbar from "./SharedToolbar";
 import { presetStore } from "./Presets";
 import { searchData } from "../common/Datalayer";
-
+import Config from '../common/Config'
 let { WidgetHelper, Menu } = window.bryntum.scheduler;
 new SharedToolbar();
 
@@ -28,7 +28,7 @@ const menu = new Menu({
     ],
     onItem({ item }) {
         console.log(item)
-        window.open(`${window.location.origin}/query-report/Guest%20History%20HMS?guest=${item}&date=today`, '_blank')
+        window.open(`${Config.siteUrl}/query-report/Guest%20History%20HMS?guest=${item}&date=today`, '_blank')
     }
 });
 export const [menuItem, combo, today, week, month, next, previous, cusDate] = WidgetHelper.append([

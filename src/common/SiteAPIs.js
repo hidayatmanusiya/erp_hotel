@@ -2,14 +2,14 @@ import Config from "./Config";
 import axios from 'axios';
 
 const axiosAPI = axios.create({
-  baseURL: process.env.REACT_APP_ENV == 'dev' ? Config.apiURL : '',
+  baseURL: Config.siteUrl,
   headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
 });
 
 export function apiPostCall(path, params, token) {
   let headers = {}
   if (process.env.REACT_APP_ENV == 'dev') {
-    headers.Authorization = Config.token
+    headers.Authorization = Config.siteToken
   } else {
     headers['X-Frappe-CSRF-Token'] = token
   }

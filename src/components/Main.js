@@ -42,9 +42,9 @@ let schedule = new Schedule({
         beforeEventEdit({ eventRecord, editor }) {
             if (eventRecord.data.idx == 0) {
                 if (eventRecord.data.check_in) {
-                    window.open(Config.apiURL + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
+                    window.open(Config.siteUrl + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
                 } else {
-                    window.open(Config.apiURL + "/app/sales-order/" + eventRecord.data.name, '_blank');
+                    window.open(Config.siteUrl + "/app/sales-order/" + eventRecord.data.name, '_blank');
                 }
                 return false
             }

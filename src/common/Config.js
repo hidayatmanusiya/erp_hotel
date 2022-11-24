@@ -1,6 +1,6 @@
 export default {
-    apiURL: 'https://hotel.bizmap.in',
-    token: 'token c2609de4fbfd645:a37f3ea3eac89f3',
+    siteUrl: process.env.REACT_APP_ENV == 'dev' ? 'https://hotel.bizmap.in' : window.location.origin,
+    siteToken: 'token c2609de4fbfd645:a37f3ea3eac89f3',
     formatTime: (date) => {
         const newDate = new Date(date);
         let month = newDate.getMonth() + 1

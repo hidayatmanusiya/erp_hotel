@@ -63,9 +63,9 @@ export const tbar = [
         type: 'textfield',
         ref: 'filterCustomers',
         icon: 'b-fa b-fa-filter',
-        cls: 'b-bright',
+        cls: 'customer-search',
         weight: 50,
-        placeholder: 'Find Customers',
+        placeholder: 'Find Guest',
         clearable: true,
         keyStrokeChangeDelay: 100,
         triggers: {
@@ -76,12 +76,14 @@ export const tbar = [
         },
         listeners: {
             change: async ({ value }) => {
+                const schedule = window.bryntum.get('scheduler');
+                let items = schedule.tbar.items
+                const selList = items.find(element => element._ref == 'listCustomers');
                 if (value) {
                     let data = await feachContacts([["Contact", "name", "like", `%${value}%`]])
-                    const schedule = window.bryntum.get('scheduler');
-                    let items = schedule.tbar.items
-                    const selList = items.find(element => element._ref == 'listCustomers');
                     selList.store.data = data
+                } else {
+                    selList.store.data = []
                 }
             }
         }
@@ -93,7 +95,7 @@ export const tbar = [
         itemTpl: item => `<i>${item.name}</i>`,
         items: [],
         onItem({ record }) {
-            window.open(`${window.location.origin}/query-report/Guest%20History%20HMS?guest=${record.data}&date=today`, '_blank')
+            window.open(`${Config.siteUrl}/app/query-report/Guest%20History%20HMS?guest=${record.name}&date=today`, '_blank')
             const schedule = window.bryntum.get('scheduler');
             let items = schedule.tbar.items
             const selList = items.find(element => element._ref == 'listCustomers');
@@ -260,7 +262,7 @@ export const EventEdit = {
             listeners: {
                 select: (e) => {
                     if (e?.record?.data?.id && e?.record?.data?.id == 'new') {
-                        window.open(Config.apiURL + "/app/customer/new-customer-1", '_blank');
+                        window.open(Config.siteUrl + "/app/customer/new-customer-1", '_blank');
                     }
                 },
             },
@@ -277,7 +279,7 @@ export const EventEdit = {
             listeners: {
                 select: (e) => {
                     if (e?.record?.data?.id && e?.record?.data?.id == 'new') {
-                        window.open(Config.apiURL + "/app/contact/new-contact-1", '_blank');
+                        window.open(Config.siteUrl + "/app/contact/new-contact-1", '_blank');
                     }
                 },
             },
