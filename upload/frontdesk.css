@@ -600,7 +600,7 @@ dl dt.right img {
 
 .b-hbox {
   position: relative;
-  overflow: visible!important;
+  overflow: visible !important;
 }
 
 .b-hbox .customer-search {
@@ -636,6 +636,16 @@ dl dt.right img {
 
 .b-button label {
   margin: 0 !important;
+}
+
+.today_date {
+  font-size: 14px;
+}
+.b-container.b-outer{
+  align-self: inherit!important;
+}
+.today_date b {
+  margin-left: 10px;
 }body {
   min-height: 100vh;
   background-color: aquamarine;

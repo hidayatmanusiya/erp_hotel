@@ -12,5 +12,12 @@ export default {
         let difference = date_1.getTime() - date_2.getTime();
         let TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
         return TotalDays;
+    },
+    formatDate(date) {
+        var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        return date.toLocaleDateString("en-US", options)
+    },
+    formatAMPM(date) {
+        return date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
     }
 }

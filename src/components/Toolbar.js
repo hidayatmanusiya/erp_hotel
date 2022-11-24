@@ -31,12 +31,12 @@ const menu = new Menu({
         window.open(`${Config.siteUrl}/query-report/Guest%20History%20HMS?guest=${item}&date=today`, '_blank')
     }
 });
-export const [menuItem, combo, today, week, month, next, previous, cusDate] = WidgetHelper.append([
+export const [menuItem, combo, date, next, previous, cusDate] = WidgetHelper.append([
     {
         type: 'button',
         icon: 'b-icon b-fa b-fa-bars',
         color: 'b-blue b-raised',
-        tooltip: 'View previous day',
+        tooltip: 'Menu',
         menu,
     },
     {
@@ -59,48 +59,58 @@ export const [menuItem, combo, today, week, month, next, previous, cusDate] = Wi
         }
     },
     {
-        type: 'button',
-        ref: 'zoomInButton',
-        color: 'b-blue b-raised',
-        text: 'Today',
-        tooltip: 'Today',
-        onClick() {
-            let schedule = window.bryntum.get('scheduler');
-            schedule.setType = 'day'
-            let endDate = new Date(schedule.startDate)
-            endDate.setDate(endDate.getDate() + 1)
-            schedule.endDate = endDate
-            setTimeout(() => searchData(), 10)
-        }
-    },
-    {
-        type: 'button',
-        ref: 'zoomOutButton',
-        color: 'b-blue b-raised',
-        text: 'Week',
-        tooltip: 'Week',
-        onClick() {
-            let schedule = window.bryntum.get('scheduler');
-            schedule.setType = 'week'
-            let endDate = new Date(schedule.startDate)
-            endDate.setDate(endDate.getDate() + 7)
-            schedule.endDate = endDate
-            setTimeout(() => searchData(), 10)
-        }
-    },
-    {
-        type: 'button',
-        ref: 'zoomOutButton',
-        color: 'b-blue b-raised',
-        text: 'Month',
-        tooltip: 'Month',
-        onClick() {
-            let schedule = window.bryntum.get('scheduler');
-            schedule.setType = 'month'
-            let endDate = new Date(schedule.startDate)
-            endDate.setDate(endDate.getDate() + 30)
-            schedule.endDate = endDate
-            setTimeout(() => searchData(), 10)
+        type: 'buttonGroup',
+        toggleGroup: true,
+        items: [
+            {
+                type: 'button',
+                ref: 'zoomInButton',
+                color: 'b-blue b-raised',
+                text: 'Today',
+                tooltip: 'Today',
+                onClick() {
+                    let schedule = window.bryntum.get('scheduler');
+                    schedule.setType = 'day'
+                    let endDate = new Date(schedule.startDate)
+                    endDate.setDate(endDate.getDate() + 1)
+                    schedule.endDate = endDate
+                    setTimeout(() => searchData(), 10)
+                }
+            },
+            {
+                type: 'button',
+                ref: 'zoomOutButton',
+                color: 'b-blue b-raised',
+                pressed: true,
+                text: 'Week',
+                tooltip: 'Week',
+                onClick() {
+                    let schedule = window.bryntum.get('scheduler');
+                    schedule.setType = 'week'
+                    let endDate = new Date(schedule.startDate)
+                    endDate.setDate(endDate.getDate() + 7)
+                    schedule.endDate = endDate
+                    setTimeout(() => searchData(), 10)
+                }
+            },
+            {
+                type: 'button',
+                ref: 'zoomOutButton',
+                color: 'b-blue b-raised',
+                text: 'Month',
+                tooltip: 'Month',
+                onClick() {
+                    let schedule = window.bryntum.get('scheduler');
+                    schedule.setType = 'month'
+                    let endDate = new Date(schedule.startDate)
+                    endDate.setDate(endDate.getDate() + 30)
+                    schedule.endDate = endDate
+                    setTimeout(() => searchData(), 10)
+                }
+            },
+        ],
+        onAction({ source: button }) {
+            // scheduler.milestoneAlign = button.id;
         }
     },
     {

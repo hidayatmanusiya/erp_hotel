@@ -1,7 +1,9 @@
+import Config from "../common/Config";
 let { DomHelper, WidgetHelper, Localizable, Events, Fullscreen } = window.bryntum.scheduler;
 
+
 const appConfig = {
-    "title": '',
+    "title": 'Staybird',
     "description": 'Staybird',
     "favicon": 'https://staybird.in/wp-content/uploads/2022/05/cropped-staybird_favicon-1-180x180.png',
     "logo": 'https://staybird.in/wp-content/uploads/2022/05/updated_logo.png.webp',
@@ -18,9 +20,28 @@ class SharedToolbar extends Localizable(Events()) {
         const me = this;
         me.insertHeader();
         me.insertFooter();
+        me.injectFavIcon();
+    }
+
+    injectFavIcon() {
+        DomHelper.createElement({
+            tag: 'link',
+            parent: document.head,
+            rel: 'icon',
+            href: appConfig.favicon,
+            sizes: '32x32'
+        });
     }
 
     insertHeader() {
+        let date = new Date()
+        let mon = date.getMonth() + 1
+        let year = date.getFullYear()
+        let month = mon < 10 ? "0" + mon : mon
+        let day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate()
+        let hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours()
+        let min = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()
+        let sec = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds()
         DomHelper.insertFirst(document.getElementById('container'), {
             tag: 'header',
             className: 'main-header',
@@ -38,7 +59,7 @@ class SharedToolbar extends Localizable(Events()) {
             <div id="title-container">
                 <span id="title">
                     ${appConfig.logo ? `<img class="image" src="${appConfig.logo}"/>` : ''}
-                    ${appConfig.title}
+                    ${`<span class="today_date"><b>Date:</b> ${Config.formatDate(new Date())}  <b>Time: </b>  ${Config.formatAMPM(new Date())}</span>`}
                 </span>
             </div>
             <div id="tools"></div>
