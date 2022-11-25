@@ -48,7 +48,7 @@ export const searchData = async () => {
     //         filtersR.push(["Room HMS", "status", "=", item.name])
     //     }
     // }
-    let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&or_filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
+    let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["name", "status", "room_type", "room_type_name", "room_no"])}&or_filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
     let resourcesArray = await apiPostCall('/', paramsR, window.frappe?.csrf_token)
     for (let item of resourcesArray) {
         item.id = item.name

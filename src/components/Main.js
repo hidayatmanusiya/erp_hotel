@@ -3,7 +3,7 @@ import { settings, searchData, saveData, feachCustomers, feachContacts, feachPac
 import { columns, localTooltips, tbar, EventEdit } from '../common/Columns';
 import Config from '../common/Config'
 import Toolbar from './Toolbar'
-let { StringHelper, DateHelper } = window.bryntum.scheduler;
+let { StringHelper, DateHelper, Toast, Popup } = window.bryntum.scheduler;
 
 let schedule = new Schedule({
     ref: 'schedule',
@@ -39,6 +39,66 @@ let schedule = new Schedule({
     eventLayout: 'none',
     managedEventSizing: false,
     listeners: {
+        beforeDragCreate({ date }) {
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var cToday = new Date(date);
+            cToday.setHours(0, 0, 0, 0);
+            if (today.getTime() > cToday.getTime()) {
+                Toast.show("Booking can't make in previous date");
+                return false;
+            } else {
+                const popup = new Popup({
+                    header: 'New Booking',
+                    autoShow: false,
+                    centered: true,
+                    closeAction: 'destroy',
+                    closable: true,
+                    width: 500,
+                    html: `<h3 style="margin-top:0.5em">Bacon ipsum dolor </h3>
+                            <p style="line-height:1.5em">amet flank ribeye ham hock, 
+                             rump alcatra pork belly pancetta leberkas bacon shoulder 
+                            meatloaf ball tip pig. Tongue jerky meatloaf pancetta 
+                            pork sirloin. Hamburger corned beef ball tip cupim 
+                            sirloin frankfurter tri-tip. Swine kevin ham hock, 
+                            drumstick flank pig shoulder shankle. Tri-tip pork 
+                            chop fatback turducken pork salami. Tongue boudin 
+                            salami flank bacon sirloin</p>`
+                });
+                // popup.show();
+                // return false;
+            }
+        },
+        beforeEventAdd({ source, eventRecord }) {
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var cToday = new Date(eventRecord.data.startDate);
+            cToday.setHours(0, 0, 0, 0);
+            if (today.getTime() > cToday.getTime()) {
+                Toast.show("Booking can't make in previous date");
+                return false;
+            } else {
+                const popup = new Popup({
+                    header: 'New Booking',
+                    autoShow: false,
+                    centered: true,
+                    closeAction: 'destroy',
+                    closable: true,
+                    width: 500,
+                    html: `<h3 style="margin-top:0.5em">Bacon ipsum dolor </h3>
+                            <p style="line-height:1.5em">amet flank ribeye ham hock, 
+                             rump alcatra pork belly pancetta leberkas bacon shoulder 
+                            meatloaf ball tip pig. Tongue jerky meatloaf pancetta 
+                            pork sirloin. Hamburger corned beef ball tip cupim 
+                            sirloin frankfurter tri-tip. Swine kevin ham hock, 
+                            drumstick flank pig shoulder shankle. Tri-tip pork 
+                            chop fatback turducken pork salami. Tongue boudin 
+                            salami flank bacon sirloin</p>`
+                });
+                // popup.show();
+                // return false;
+            }
+        },
         beforeEventEdit({ eventRecord, editor }) {
             if (eventRecord.data.idx == 0) {
                 if (eventRecord.data.check_in) {
