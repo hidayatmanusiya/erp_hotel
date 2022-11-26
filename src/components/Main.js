@@ -10,7 +10,7 @@ let schedule = new Schedule({
     id: 'scheduler',
     insertFirst: 'main',
     features: {
-        eventDragCreate: false,
+        // eventDragCreate: false,
         nonWorkingTime: true,
         eventResize: false,
         eventTooltip: false,
