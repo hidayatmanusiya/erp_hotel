@@ -13,11 +13,17 @@ export default {
         let TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
         return TotalDays;
     },
+    formatTodayDateTime(date) {
+        var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        let D = date.toLocaleDateString("en-US", options)
+        let T = date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
+        return `<b>Date:</b> ${D}  <b>Time: </b>  ${T}`
+    },
     formatDate(date) {
         var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
         return date.toLocaleDateString("en-US", options)
     },
     formatAMPM(date) {
         return date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-    }
+    },
 }

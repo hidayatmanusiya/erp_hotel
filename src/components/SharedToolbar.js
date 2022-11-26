@@ -1,7 +1,6 @@
 import Config from "../common/Config";
 let { DomHelper, WidgetHelper, Localizable, Events, Fullscreen } = window.bryntum.scheduler;
 
-
 const appConfig = {
     "title": 'Staybird',
     "description": 'Staybird',
@@ -21,6 +20,14 @@ class SharedToolbar extends Localizable(Events()) {
         me.insertHeader();
         me.insertFooter();
         me.injectFavIcon();
+
+        setInterval(() => {
+            if (document.getElementById("today_date")) {
+                let todayDate = document.getElementById("today_date");
+                let date = Config.formatTodayDateTime(new Date())
+                todayDate.innerHTML = date
+            }
+        }, 1000);
     }
 
     injectFavIcon() {
@@ -33,15 +40,10 @@ class SharedToolbar extends Localizable(Events()) {
         });
     }
 
+
+
     insertHeader() {
-        let date = new Date()
-        let mon = date.getMonth() + 1
-        let year = date.getFullYear()
-        let month = mon < 10 ? "0" + mon : mon
-        let day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate()
-        let hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours()
-        let min = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()
-        let sec = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds()
+        let date = Config.formatTodayDateTime(new Date())
         DomHelper.insertFirst(document.getElementById('container'), {
             tag: 'header',
             className: 'main-header',
@@ -59,7 +61,7 @@ class SharedToolbar extends Localizable(Events()) {
             <div id="title-container">
                 <span id="title">
                     ${appConfig.logo ? `<img class="image" src="${appConfig.logo}"/>` : ''}
-                    ${`<span class="today_date"><b>Date:</b> ${Config.formatDate(new Date())}  <b>Time: </b>  ${Config.formatAMPM(new Date())}</span>`}
+                    ${`<span id="today_date" class="today_date">${date}</span>`}
                 </span>
             </div>
             <div id="tools"></div>

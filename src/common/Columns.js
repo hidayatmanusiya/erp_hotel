@@ -1,5 +1,5 @@
 let { DateHelper, ResourceStore } = window.bryntum.scheduler;
-import { searchData, feachProperty, feachRoomType, feachContacts } from '../common/Datalayer';
+import { searchData, feachProperty, feachRoomType, feachContacts, ChangeRoomStatus } from '../common/Datalayer';
 import Config from './Config'
 let endDate = new Date()
 endDate.setDate(endDate.getDate() + 14)
@@ -7,34 +7,39 @@ endDate.setDate(endDate.getDate() + 14)
 export const columns = [
     {
         text: 'Status',
-        field: 'status',
+        field: 'id',
         tooltip: 'Status',
+        sortable: false,
         width: 20,
         region: 'left',
         htmlEncode: false,
-        renderer({ value }) {
+        renderer: ({ record }) => {
             let roomStatus = JSON.parse(window.sessionStorage.getItem('roomStatus'))
             if (roomStatus) {
-                const status = roomStatus.filter(element => element.name == value);
+                const status = roomStatus.filter(element => element.name == record.status);
                 return `<div class="capacity b-fa b-fa-${status[0]?.icon}"></div>`;
             }
+            return ''
         },
         editor: {
             type: 'combo',
+            valueField: 'status',
             items: ['Out Of Order', 'Availabel', 'Dirty', 'Occupied'],
             editable: false,
             listeners: {
                 select: (e) => {
-                    if (e?.source?.initialValue != e?.record?.data?.text) {
-                        //    console.log(e?.source)
-                        //    debugger
-                    }
+                    ChangeRoomStatus(e?.source?.initialValue, e?.record?.data?.text)
                 },
             },
         }
     },
-    { text: 'Room Type', tooltip: 'Room Type', editor: null, sort: null, field: 'room_type_name', width: 100, region: 'left' },
-    { text: `Room No`, id: "room_column", tooltip: 'Room No', editor: null, field: 'room_no', width: 100, region: 'left' },
+    {
+        // text: 'Room Type', tooltip: 'Room Type', field: 'room_type', width: 100, region: 'left', sortable: false, renderer: ({ record }) => record.room_type_name
+        text: 'Room Type', tooltip: 'Room Type', field: 'room_type', width: 100, region: 'left', sortable: false, renderer: ({ record }) => `${record.abbr} - ${record.property ? record.property : ''}`
+    },
+    {
+        text: `Room No`, tooltip: 'Room No', editor: null, field: 'room_no', width: 100, region: 'left', sortable: false, id: "room_column"
+    },
 ]
 
 export const localTooltips = {

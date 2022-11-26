@@ -5,30 +5,19 @@ import Config from '../common/Config'
 let { WidgetHelper, Menu } = window.bryntum.scheduler;
 new SharedToolbar();
 
+const items = [
+    { icon: 'b-icon b-fa b-fa-circle', text: 'Guest History', link: '/app/query-report/Guest%20History%20HMS' },
+    { icon: 'b-icon b-fa b-fa-circle', text: 'Room Checkin/Checkout', link: '/app/query-report/Rooms%20To%20Checkout' },
+    { icon: 'b-icon b-fa b-fa-circle', text: 'Night Audit', link: '/app/query-report/Night%20Audit' },
+    { icon: 'b-icon b-fa b-fa-circle', text: 'Room Occupancy', link: '/app/query-report/Room%20Occupancy%20and%20Revenue%20HMS' },
+]
+
 const menu = new Menu({
     anchor: true,
     autoShow: false,
-    items: [
-        {
-            icon: 'b-icon b-fa b-fa-circle',
-            text: 'Menu 1'
-        },
-        {
-            icon: 'b-icon b-fa b-fa-circle',
-            text: 'Menu 1'
-        },
-        {
-            icon: 'b-icon b-fa b-fa-circle',
-            text: 'Menu 1'
-        },
-        {
-            icon: 'b-icon b-fa b-fa-circle',
-            text: 'Menu 1'
-        },
-    ],
+    items: items,
     onItem({ item }) {
-        console.log(item)
-        window.open(`${Config.siteUrl}/query-report/Guest%20History%20HMS?guest=${item}&date=today`, '_blank')
+        window.open(`${Config.siteUrl}${item.link}`, '_blank')
     }
 });
 export const [menuItem, combo, date, next, previous, cusDate] = WidgetHelper.append([

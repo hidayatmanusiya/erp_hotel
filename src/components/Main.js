@@ -10,7 +10,7 @@ let schedule = new Schedule({
     id: 'scheduler',
     insertFirst: 'main',
     features: {
-        // eventDragCreate: false,
+        eventDragCreate: false,
         nonWorkingTime: true,
         eventResize: false,
         eventTooltip: false,
@@ -21,7 +21,6 @@ let schedule = new Schedule({
         eventTooltip: localTooltips,
         group: 'room_type_name',
         eventEdit: EventEdit,
-
     },
     columns: columns,
     rowHeight: 20,

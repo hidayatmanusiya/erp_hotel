@@ -606,10 +606,13 @@ dl dt.right img {
 .b-hbox .customer-search {
   margin-right: 100px !important;
 }
-
+.b-hbox .customer-list.b-empty {
+  display: none;
+}
 .b-hbox .customer-list {
   position: absolute;
   top: 38px;
+  display: block;
   z-index: 99;
   background: transparent;
   left: 10px;
@@ -646,6 +649,9 @@ dl dt.right img {
 }
 .today_date b {
   margin-left: 10px;
+}
+.b-button.b-raised.b-blue.b-pressed{
+  background-color: #b6ad11;
 }body {
   min-height: 100vh;
   background-color: aquamarine;

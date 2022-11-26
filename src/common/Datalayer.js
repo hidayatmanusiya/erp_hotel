@@ -1,4 +1,4 @@
-import { apiPostCall } from './SiteAPIs'
+import { apiPostCall, apiPutCall } from './SiteAPIs'
 import Config from './Config'
 import { cusDate } from '../components/Toolbar';
 const { Mask } = window.bryntum.scheduler;
@@ -48,7 +48,7 @@ export const searchData = async () => {
     //         filtersR.push(["Room HMS", "status", "=", item.name])
     //     }
     // }
-    let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["name", "status", "room_type", "room_type_name", "room_no"])}&or_filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
+    let paramsR = `doctype=Room+HMS&cmd=frappe.client.get_list&fields=${JSON.stringify(["name", "status", "room_type", "room_type_name", "room_no", "company", "abbr", "property"])}&or_filters=${JSON.stringify(filtersR)}&limit_page_length=None`;
     let resourcesArray = await apiPostCall('/', paramsR, window.frappe?.csrf_token)
     for (let item of resourcesArray) {
         item.id = item.name
@@ -91,8 +91,12 @@ export const searchData = async () => {
     let tempEventIds = {}
     for (let item of eventsArray) {
         if (item.status == 'Pre-Check In' || item.status == 'Checked In' || item.status == 'Checked Out') {
-            item.startDate = new Date(item.check_in)
-            item.endDate = new Date(item.check_out)
+            let startDate = new Date(item.check_in)
+            let endDate = new Date(item.check_out)
+            startDate.setHours(0, 0, 0, 0)
+            endDate.setHours(0, 0, 0, 0)
+            item.startDate = startDate
+            item.endDate = endDate
             item.id = item.name
             item.resourceId = item.room_no
             item.text = item.customer
@@ -102,8 +106,12 @@ export const searchData = async () => {
     }
     for (let item of eventsArrayS) {
         if (item.name in tempEventIds == false) {
-            item.startDate = new Date(item.check_in_cf)
-            item.endDate = new Date(item.check_out_cf)
+            let startDate = new Date(item.check_in_cf)
+            let endDate = new Date(item.check_out_cf)
+            startDate.setHours(0, 0, 0, 0)
+            endDate.setHours(0, 0, 0, 0)
+            item.startDate = startDate
+            item.endDate = endDate
             item.id = item.name
             item.resourceId = item.room_no
             item.text = item.customer
@@ -214,9 +222,12 @@ export const settings = async () => {
     const schedule = window.bryntum.get('scheduler');
     let items = schedule.tbar.items
 
+    let startDate = new Date()
     let endDate = new Date()
     endDate.setDate(endDate.getDate() + 7)
-    schedule.startDate = new Date()
+    startDate.setHours(0, 0, 0, 0)
+    endDate.setHours(0, 0, 0, 0)
+    schedule.startDate = startDate
     schedule.endDate = new Date(endDate)
     schedule.setType = 'week'
 
@@ -234,6 +245,14 @@ export const settings = async () => {
         selPropertie.value = property
     }
     searchData()
+}
+
+export const ChangeRoomStatus = async (roomId, status) => {
+    let data = JSON.stringify({ "status": status });
+    let roomStatus = await apiPutCall(`/api/resource/Room HMS/${roomId}`, data, window.frappe?.csrf_token)
+    if (roomStatus) {
+        searchData()
+    }
 }
 
 export const saveData = async (event) => {
@@ -271,5 +290,7 @@ export const saveData = async (event) => {
         }
     );
     let bookRoom = await apiPostCall('/api/resource/Sales Order', data, window.frappe?.csrf_token)
-    searchData()
+    if (bookRoom) {
+        searchData()
+    }
 }
