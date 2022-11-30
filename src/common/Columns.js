@@ -145,7 +145,7 @@ export const tbar = [
         items: [],
         name: 'properties',
         weight: 50,
-        placeholder: 'Select Propertie',
+        placeholder: 'Select Property',
         clearable: true,
         multiSelect: true,
         chipView: {

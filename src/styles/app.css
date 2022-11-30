@@ -153,5 +153,5 @@ dl dt.right img {
   margin-left: 10px;
 }
 .b-button.b-raised.b-blue.b-pressed{
-  background-color: #b6ad11;
+  background-color: #b6ad11!important;
 }
