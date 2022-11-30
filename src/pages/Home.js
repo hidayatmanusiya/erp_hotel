@@ -1,4 +1,4 @@
-import React, { useState, createRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Col, Row, Button, Drawer, Image, Input, Tooltip, Select, Space, Form, DatePicker, Switch } from 'antd';
 import {
     MenuOutlined,
@@ -19,90 +19,73 @@ import Schedule from "../Schedule";
 const { Option } = Select;
 let { StringHelper, DateHelper, Toast, Popup } = window.bryntum.scheduler;
 
-// const scheduler = new Schedule({
 
-//     appendTo: 'container_book',
+const resources = [
+    { id: 11, name: 'Angelo' },
+    { id: 12, name: 'Gloria' },
+    { id: 13, name: 'Madison' },
+    { id: 14, name: 'Malik' },
+    { id: 15, name: 'Mark' },
+    { id: 16, name: 'Rob' }
+]
 
-//     features: {
-//         eventDragCreate: false,
-//         eventResize: false,
-//         eventTooltip: false,
-//         stickyEvents: false,
-//         eventDrag: {
-//             constrainDragToResource: true
-//         }
-//     },
-
-//     columns: [
-//         {
-//             type: 'resourceInfo',
-//             text: 'Staff',
-//             field: 'name',
-//             width: '13em',
-//             showEventCount: false,
-//             showRole: true
-//         }
-//     ],
-
-//     rowHeight: 80,
-//     startDate: new Date(2017, 5, 1),
-//     endDate: new Date(2017, 5, 11),
-//     viewPreset: {
-//         base: 'dayAndWeek',
-//         headers: [
-//             {
-//                 unit: 'day',
-//                 align: 'center',
-//                 renderer: (startDate, endDate) => `
-//                     <div>${DateHelper.format(startDate, 'ddd')}</div>
-//                     <div>${DateHelper.format(startDate, 'DD MMM')}</div>
-//                 `
-//             }
-//         ]
-//     },
-//     eventLayout: 'none',
-//     managedEventSizing: false,
-
-//     crudManager: {
-//         autoLoad: true,
-//         eventStore: {
-//             fields: [
-//                 'startInfo',
-//                 'startInfoIcon',
-//                 'endInfo',
-//                 'endInfoIcon'
-//             ]
-//         },
-//         loadUrl: 'data.json'
-//     },
-
-//     eventRenderer({ eventRecord, resourceRecord, renderData }) {
-//         let startEndMarkers = '';
-
-//         // Add a custom CSS classes to the template element data by setting a property name
-//         renderData.cls.milestone = eventRecord.isMilestone;
-//         renderData.cls.normalEvent = !eventRecord.isMilestone;
-//         renderData.cls[resourceRecord.id] = 1;
-
-//         if (eventRecord.startInfo) {
-//             startEndMarkers = `<i class="b-start-marker ${eventRecord.startInfoIcon}" data-btip="${eventRecord.startInfo}"></i>`;
-//         }
-//         if (eventRecord.endInfo) {
-//             startEndMarkers += `<i class="b-end-marker ${eventRecord.endInfoIcon}" data-btip="${eventRecord.endInfo}"></i>`;
-//         }
-
-//         return startEndMarkers + StringHelper.encodeHtml(eventRecord.name);
-//     }
-// });
-
+const events = [
+    {
+        id: 11,
+        resourceId: 11,
+        name: 'Implement Feature X',
+        startDate: new Date(2022, 0, 11, 28),
+        duration: 2,
+        durationUnit: 'h'
+    },
+    {
+        id: 12,
+        resourceId: 12,
+        name: 'Refactoring',
+        startDate: new Date(2022, 0, 11, 30),
+        duration: 2,
+        durationUnit: 'h'
+    },
+    {
+        id: 13,
+        resourceId: 16,
+        name: 'Write application tests',
+        startDate: new Date(2022, 0, 12, 1),
+        duration: 2,
+        durationUnit: 'h'
+    }
+]
 
 function Home() {
-    // let myRef = createRef();
+    const helper = useRef();
+
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
     const text = <span>prompt text</span>;
     const [open, setOpen] = useState(false);
     const { Option, OptGroup } = Select;
+
+    useEffect(() => {
+        if (!helper.current) {
+            helper.current = new Schedule({
+                ref: 'schedule',
+                id: 'scheduler',
+                appendTo: 'container_book',
+                columns: [
+                    {
+                        type: 'resourceInfo',
+                        text: 'Stockholm office',
+                        width: '15em'
+                    }
+                ],
+            });
+            const schedule = window.bryntum.get('scheduler');
+            console.log(schedule)
+            schedule.resourceStore.data = resources
+            schedule.eventStore.data = events
+        }
+    }, []);
+
 
 
     const showDrawer = () => {
@@ -121,8 +104,6 @@ function Home() {
     const onChange = (date, dateString) => {
         console.log(date, dateString);
     };
-
-
 
     return (
         <>
@@ -215,37 +196,37 @@ function Home() {
 
                         <span className='all-number'>
                             <span>All</span>
-                            <span class="dot">58</span>
+                            <span className="dot">58</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Vacant</span>
-                            <span class="dot">55</span>
+                            <span className="dot">55</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Occupied</span>
-                            <span class="dot">1</span>
+                            <span className="dot">1</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Reserved</span>
-                            <span class="dot">0</span>
+                            <span className="dot">0</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Blocked</span>
-                            <span class="dot">2</span>
+                            <span className="dot">2</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Due Out</span>
-                            <span class="dot">0</span>
+                            <span className="dot">0</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Dirty</span>
-                            <span class="dot">9</span>
+                            <span className="dot">9</span>
                         </span>
                     </Col>
 
@@ -289,6 +270,8 @@ function Home() {
 
                     </Col>
                 </Row>
+
+                <div id="container_book"></div>
 
             </div>
 
