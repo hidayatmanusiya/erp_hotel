@@ -1,4 +1,12 @@
-import './components/Main';
-import './styles/shared.css';
-import './styles/app.css';
-import './styles/main.css';
+import './App.scss';
+import Layout from './Layout';
+
+function App() {
+  return (
+    <div className="sc-kIuWHm kxXcmP">
+      <Layout />
+    </div>
+  );
+}
+
+export default App;
