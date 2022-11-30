@@ -14,6 +14,7 @@ import {
     MedicineBoxOutlined
 } from '@ant-design/icons';
 import logo from "../images/logo.png";
+import Config from "../common/Config";
 import Schedule from "../Schedule";
 
 const { Option } = Select;
@@ -57,8 +58,7 @@ const events = [
 ]
 
 function Home() {
-    const helper = useRef();
-
+    const schedulerHelper = useRef();
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
     const text = <span>prompt text</span>;
@@ -66,11 +66,25 @@ function Home() {
     const { Option, OptGroup } = Select;
 
     useEffect(() => {
-        if (!helper.current) {
-            helper.current = new Schedule({
+        if (!schedulerHelper.current) {
+            schedulerHelper.current = new Schedule({
                 ref: 'schedule',
                 id: 'scheduler',
-                appendTo: 'container_book',
+                appendTo: 'container',
+
+                features: {
+                    // eventDragCreate: false,
+                    nonWorkingTime: true,
+                    eventResize: false,
+                    eventTooltip: false,
+                    stickyEvents: false,
+                    eventDrag: {
+                        disabled: true
+                    },
+                    // eventTooltip: localTooltips,
+                    group: 'room_type_name',
+                    // eventEdit: EventEdit,
+                },
                 columns: [
                     {
                         type: 'resourceInfo',
@@ -78,6 +92,87 @@ function Home() {
                         width: '15em'
                     }
                 ],
+                // rowHeight: 20,
+                viewPreset: {
+                    base: 'weekAndMonth',
+                    // tickWidth: 5,
+                    headers: [
+                        {
+                            unit: 'day',
+                            align: 'center',
+                            renderer: (startDate, endDate) => `<div>${DateHelper.format(startDate, 'dd')} <br />${DateHelper.format(startDate, 'DD')}</div>`
+                        },
+                    ]
+                },
+                eventLayout: 'none',
+                managedEventSizing: false,
+                listeners: {
+                    beforeDragCreate({ date }) {
+                        var today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        var cToday = new Date(date);
+                        cToday.setHours(0, 0, 0, 0);
+                        if (today.getTime() > cToday.getTime()) {
+                            Toast.show("Booking can't make in previous date");
+                            return false;
+                        } else {
+                            
+                            // popup.show();
+                            // return false;
+                        }
+                    },
+                    beforeEventAdd({ source, eventRecord }) {
+                        var today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        var cToday = new Date(eventRecord.data.startDate);
+                        cToday.setHours(0, 0, 0, 0);
+                        if (today.getTime() > cToday.getTime()) {
+                            Toast.show("Booking can't make in previous date");
+                            return false;
+                        } else {
+                            
+                            // return false;
+                        }
+                    },
+                    beforeEventEdit({ eventRecord, editor }) {
+                        if (eventRecord.data.idx == 0) {
+                            if (eventRecord.data.check_in) {
+                                window.open(Config.siteUrl + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
+                            } else {
+                                window.open(Config.siteUrl + "/app/sales-order/" + eventRecord.data.name, '_blank');
+                            }
+                            return false
+                        }
+                    },
+                    async beforeEventEditShow({ eventRecord, editor }) {
+                        editor.title = (eventRecord.data.idx == 0) ? `Modifier ${eventRecord.name || ''}` : 'New Booking';
+            
+                        // let customers = await feachCustomers({})
+                        // customers.unshift({ id: 'new', text: "Add New Customer", eventColor: 'green' })
+                        // let customersCombo = editor.items.find(element => element._ref == 'customerCombo');
+                        // customersCombo.store.data = customers
+            
+                        // let contacts = await feachContacts({})
+                        // contacts.unshift({ id: 'new', text: "Add New contact", eventColor: 'green' })
+                        // let contactsCombo = editor.items.find(element => element._ref == 'contactsCombo');
+                        // contactsCombo.store.data = contacts
+            
+                        // let packages = await feachPackages({})
+                        // let packageCombo = editor.items.find(element => element._ref == 'packageCombo');
+                        // packageCombo.store.data = packages
+            
+                    },
+                    afterEventSave({ eventEdit, eventRecord }) {
+                        // saveData(eventRecord.data);
+                    },
+                },
+                eventRenderer({ eventRecord, resourceRecord, renderData }) {
+                    let startEndMarkers = '';
+                    renderData.cls[eventRecord.status] = 1;
+                    return startEndMarkers + StringHelper.encodeHtml(eventRecord?.customer ? (eventRecord?.customer?.data?.name ? eventRecord?.customer?.data?.name : eventRecord.customer) : 'New');
+                },
+
+
             });
             const schedule = window.bryntum.get('scheduler');
             console.log(schedule)
@@ -271,7 +366,7 @@ function Home() {
                     </Col>
                 </Row>
 
-                <div id="container_book"></div>
+                <div id="container"></div>
 
             </div>
 

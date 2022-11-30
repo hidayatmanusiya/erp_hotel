@@ -1727,6 +1727,17 @@ h2 {
 
 // Add By Papu
 
+#container {
+    position: relative;
+    flex: 1;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    transform: translate(0, 0);
+    overflow: hidden;
+}
+
 .menu-bar {
     background: #FFF;
     padding: 18px 10px;
