@@ -13,8 +13,8 @@ import {
     PlusOutlined,
     MedicineBoxOutlined
 } from '@ant-design/icons';
-import logo from "./Images/logo.png";
-import Schedule from "./Schedule";
+import logo from "../images/logo.png";
+import Schedule from "../Schedule";
 
 const { Option } = Select;
 let { StringHelper, DateHelper, Toast, Popup } = window.bryntum.scheduler;
@@ -96,7 +96,7 @@ let { StringHelper, DateHelper, Toast, Popup } = window.bryntum.scheduler;
 // });
 
 
-function Layout() {
+function Home() {
     // let myRef = createRef();
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
@@ -296,4 +296,4 @@ function Layout() {
     );
 }
 
-export default Layout;
+export default Home;
