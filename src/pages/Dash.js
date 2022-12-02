@@ -1,9 +1,9 @@
 import React, { useState, createRef } from 'react';
 import { Col, Row, Button, Drawer, Image, Input, Tooltip, Select, Space, Form, DatePicker, Switch } from 'antd';
 
-import logo from "../images/logo.png";
+// import logo from "../Images/logo.phg";
 
-import CanvasJSReact from '../images/canvasjs/canvasjs.react';
+import CanvasJSReact from '../Images/canvasjs/canvasjs.react';
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 

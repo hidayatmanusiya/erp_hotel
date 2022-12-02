@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Col, Row, Button, Drawer, Image, Input, Tooltip, Select, Space, Form, DatePicker, Switch } from 'antd';
+import { Col, Row, Button, Drawer, Image, Input, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
 import {
     MenuOutlined,
     ExclamationCircleOutlined,
     CalendarOutlined,
     CreditCardOutlined,
-    MailOutlined,
     UserOutlined,
     StarOutlined,
     NotificationOutlined,
     BorderRightOutlined,
     PlusOutlined,
-    MedicineBoxOutlined
+    MedicineBoxOutlined,
+    AppstoreOutlined, MailOutlined, SettingOutlined
 } from '@ant-design/icons';
-import logo from "../images/logo.png";
+import logo from "../Images/logo.png";
 import Config from "../common/Config";
 import Schedule from "../Schedule";
 
@@ -57,13 +57,53 @@ const events = [
     }
 ]
 
+const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
+
+function getItem(label, key, icon, children, type) {
+    return {
+        key,
+        icon,
+        children,
+        label,
+        type,
+    };
+}
+
+
+const items = [
+    getItem('Front Office', 'sub1', <MailOutlined />, [
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Reports', '1', <MailOutlined />),
+    ]),
+    getItem('Cashiering', 'sub2', <AppstoreOutlined />, [
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Submenu', 'sub3', null, [getItem('Option 7', '7'), getItem('Option 8', '8')]),
+    ]),
+    getItem('Housekeeping', 'sub4', <SettingOutlined />, [
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Reports', '1', <MailOutlined />),
+        getItem('Reports', '1', <MailOutlined />),
+    ]),
+    getItem('Reports', '1', <MailOutlined />),
+    getItem('Net Locks', '2', <CalendarOutlined />),
+    getItem('Night Audit Log', '2', <CalendarOutlined />),
+
+];
+
 function Home() {
     const schedulerHelper = useRef();
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
     const text = <span>prompt text</span>;
     const [open, setOpen] = useState(false);
+    const [menu, setMenu] = useState(false);
+    const [side, setSide] = useState(false);
     const { Option, OptGroup } = Select;
+    const [type, setType] = useState('time');
 
     useEffect(() => {
         if (!schedulerHelper.current) {
@@ -116,7 +156,7 @@ function Home() {
                             Toast.show("Booking can't make in previous date");
                             return false;
                         } else {
-                            
+
                             // popup.show();
                             // return false;
                         }
@@ -130,7 +170,7 @@ function Home() {
                             Toast.show("Booking can't make in previous date");
                             return false;
                         } else {
-                            
+
                             // return false;
                         }
                     },
@@ -146,21 +186,21 @@ function Home() {
                     },
                     async beforeEventEditShow({ eventRecord, editor }) {
                         editor.title = (eventRecord.data.idx == 0) ? `Modifier ${eventRecord.name || ''}` : 'New Booking';
-            
+
                         // let customers = await feachCustomers({})
                         // customers.unshift({ id: 'new', text: "Add New Customer", eventColor: 'green' })
                         // let customersCombo = editor.items.find(element => element._ref == 'customerCombo');
                         // customersCombo.store.data = customers
-            
+
                         // let contacts = await feachContacts({})
                         // contacts.unshift({ id: 'new', text: "Add New contact", eventColor: 'green' })
                         // let contactsCombo = editor.items.find(element => element._ref == 'contactsCombo');
                         // contactsCombo.store.data = contacts
-            
+
                         // let packages = await feachPackages({})
                         // let packageCombo = editor.items.find(element => element._ref == 'packageCombo');
                         // packageCombo.store.data = packages
-            
+
                     },
                     afterEventSave({ eventEdit, eventRecord }) {
                         // saveData(eventRecord.data);
@@ -182,10 +222,18 @@ function Home() {
     }, []);
 
 
-
     const showDrawer = () => {
         setOpen(true);
     };
+
+    const showSearch = () => {
+        setSide(true);
+    };
+
+    const showMenu = () => {
+        setOpen(true);
+    };
+
 
     const onClose = () => {
         setOpen(false);
@@ -200,16 +248,44 @@ function Home() {
         console.log(date, dateString);
     };
 
+    const [openKeys, setOpenKeys] = useState(['sub1']);
+    const onOpenChange = (keys) => {
+        const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
+        if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
+            setOpenKeys(keys);
+        } else {
+            setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+        }
+    };
+
+    const PickerWithType = ({ type, onChange }) => {
+        if (type === 'time') return <TimePicker onChange={onChange} />;
+        if (type === 'date') return <DatePicker onChange={onChange} />;
+        return <DatePicker picker={type} onChange={onChange} />;
+    };
+
+
+
     return (
         <>
             <div className="menu-bar">
                 <Row>
-                    <Col xs={{ span: 24 }} lg={{ span: 13 }}>
-                        <MenuOutlined type="primary" onClick={showDrawer} />
-                        <Drawer title="Basic Drawer" placement="left" onClose={onClose} open={open}>
-                            <p>Some contents...</p>
-                            <p>Some contents...</p>
-                            <p>Some contents...</p>
+                    <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                        <MenuOutlined type="primary" onClick={showMenu}
+
+                        />
+                        <Drawer placement="left" onClose={onClose} open={open}
+                            style={{ width: "74%" }}
+                        >
+                            <Menu
+                                mode="inline"
+                                openKeys={openKeys}
+                                onOpenChange={onOpenChange}
+                                style={{
+                                    width: 256,
+                                }}
+                                items={items}
+                            />
                         </Drawer>
                         <Image preview={false}
                             width={150}
@@ -221,42 +297,89 @@ function Home() {
                         </Tooltip>
                     </Col>
 
-                    <Col xs={{ span: 24 }} lg={{ span: 11 }}>
+                    <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                         <div className='right-bar'>
                             <Tooltip title={text} className='menu-icon'>
-                                <CalendarOutlined />
+                                <i onClick={setSide} class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                <calendar-plus-o onClick={setSide} />
+
+                                <Drawer
+                                    title="Quick Reservation"
+                                    width={720}
+                                    onClose={onClose}
+                                    open={side}
+                                    bodyStyle={{ paddingBottom: 80 }}
+                                // extra={
+                                //     <Space>
+                                //         <Button onClick={onClose}>Cancel</Button>
+                                //         <Button onClick={onClose} type="primary">
+                                //             Submit
+                                //         </Button>
+                                //     </Space>
+                                // }
+                                >
+                                    <Form hideRequiredMark>
+
+                                       
+
+
+
+                                        <div className='reservation'>
+                                         
+                                            <Space>
+
+                                            <div>
+                                            <p>jbb</p>
+                                            <DatePicker onChange={onChange} />
+                                        </div>
+                                                <PickerWithType type={type} onChange={(value) => console.log(value)} />
+
+                                                <h5>1</h5>
+                                            </Space>
+
+                                        </div>
+                                    </Form>
+                                </Drawer>
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <CreditCardOutlined />
+                                <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                                <card-o />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <CalendarOutlined />
+                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                                <calendar-o />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <MailOutlined />
+                                <i class="fa fa-building" aria-hidden="true"></i>
+                                <building />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <UserOutlined />
+                                <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                                <envelope-o />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <CalendarOutlined />
+                                <i class="fa fa-user-plus" aria-hidden="true"></i>
+                                <user-plus />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <StarOutlined />
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                                <star />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <NotificationOutlined />
+                                <i class="fa fa-bullhorn" aria-hidden="true"></i>
+                                <bullhorn />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <BorderRightOutlined />
+                                <i class="fa fa-th" aria-hidden="true"></i>
+                                <th />
                             </Tooltip>
                             <div className='vl'></div>
                             <div className='arizona'>
@@ -352,14 +475,14 @@ function Home() {
                         />
                         <Switch checkedChildren="Cozy" unCheckedChildren="Complit" defaultChecked />
 
-                        <MedicineBoxOutlined onClick={showDrawer}>
+                        {/* <MedicineBoxOutlined onClick={showDrawer}>
                             Open
                         </MedicineBoxOutlined>
                         <Drawer title="Basic Drawer" placement="right" onClose={onClose} open={open}>
                             <p>Some contents...</p>
                             <p>Some contents...</p>
                             <p>Some contents...</p>
-                        </Drawer>
+                        </Drawer> */}
 
                         <ExclamationCircleOutlined />
 
