@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Col, Row, Button, Drawer, Image, Input, InputNumber, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
+import { Col, Row, Button, Drawer, Image, Input, InputNumber, Modal, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
 import {
     MenuOutlined,
     ExclamationCircleOutlined,
@@ -112,8 +112,12 @@ function Home() {
     const onSearch = (value) => console.log(value);
     const text = <span>prompt text</span>;
     const [open, setOpen] = useState(false);
+    const [opens, setOpens] = useState(false);
     const [menu, setMenu] = useState(false);
     const [side, setSide] = useState(false);
+    const [view, setView] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [drawer, setDrawer] = useState(false);
     const { Option, OptGroup } = Select;
     const [type, setType] = useState('time');
 
@@ -251,9 +255,12 @@ function Home() {
     };
 
 
+
+
     const onClose = () => {
         setOpen(false);
     };
+
 
     const handleChange = (value) => {
         console.log(`selected ${value}`);
@@ -273,6 +280,19 @@ function Home() {
             setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
         }
     };
+
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+
 
     const PickerWithType = ({ type, onChange }) => {
         if (type === 'time') return <TimePicker onChange={onChange} />;
@@ -598,20 +618,49 @@ function Home() {
                                 <user-plus />
                             </Tooltip>
 
+
+
                             <Tooltip title={text} className='menu-icon'>
                                 <i class="fa fa-star" aria-hidden="true"></i>
                                 <star />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <i class="fa fa-bullhorn" aria-hidden="true"></i>
-                                <bullhorn />
+                                <i onClick={setView} class="fa fa-bullhorn" aria-hidden="true"></i>
+                                <bullhorn onClick={setView} />
+
+                                <Drawer title="What's new in eZee Absolute" placement="right" onClose={onClose} open={view}>
+                                    <div className='absolute'>
+                                        <Space>
+                                            <h6>ENHANCEMENT</h6>
+                                            <p>28 Nov 2022</p>
+                                        </Space>
+                                        <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
+                                        <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
+                                        <h5><a href=''>Read More  <i class="fa fa-external-link" aria-hidden="true"></i></a> </h5>
+                                    </div>
+
+                                    <div className='absolute'>
+                                        <Space>
+                                            <h6>ENHANCEMENT</h6>
+                                            <p>28 Nov 2022</p>
+                                        </Space>
+                                        <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
+                                        <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
+                                        <h5><a href=''>Read More  <i class="fa fa-external-link" aria-hidden="true"></i></a> </h5>
+                                    </div>
+                                </Drawer>
                             </Tooltip>
 
+
+
                             <Tooltip title={text} className='menu-icon'>
-                                <i class="fa fa-th" aria-hidden="true"></i>
-                                <th />
+                                <i onClick={showModal} class="fa fa-th" aria-hidden="true"></i>
+                                <th onClick={showModal} />
+
+                                
                             </Tooltip>
+                            
                             <div className='vl'></div>
                             <div className='arizona'>
                                 <UserOutlined />
