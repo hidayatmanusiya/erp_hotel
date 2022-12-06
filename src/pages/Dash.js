@@ -1,9 +1,10 @@
 import React, { useState, createRef } from 'react';
 import { Col, Row, Button, Drawer, Image, Input, Tooltip, Select, Space, Form, DatePicker, Switch } from 'antd';
+import { useNavigate } from "react-router-dom";
 
-// import logo from "../Images/logo.phg";
+// import logo from "../images/logo.phg";
 
-import CanvasJSReact from '../Images/canvasjs/canvasjs.react';
+import CanvasJSReact from '../images/canvasjs/canvasjs.react';
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -12,7 +13,7 @@ let { StringHelper, DateHelper, Toast, Popup } = window.bryntum.scheduler;
 
 
 function Dash() {
-
+    const navigate = useNavigate();
     const options_one = {
         title: {
             text: "Type One"

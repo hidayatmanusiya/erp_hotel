@@ -13,7 +13,8 @@ import {
     MedicineBoxOutlined,
     AppstoreOutlined, MailOutlined, SettingOutlined
 } from '@ant-design/icons';
-import logo from "../Images/logo.png";
+import { useNavigate } from "react-router-dom";
+import logo from "../images/logo.png";
 import Config from "../common/Config";
 import Schedule from "../Schedule";
 
@@ -95,6 +96,7 @@ const items = [
 ];
 
 function Home() {
+    const navigate = useNavigate();
     const schedulerHelper = useRef();
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
@@ -271,18 +273,16 @@ function Home() {
             <div className="menu-bar">
                 <Row>
                     <Col xs={{ span: 24 }} lg={{ span: 12 }}>
-                        <MenuOutlined type="primary" onClick={showMenu}
-
-                        />
-                        <Drawer placement="left" onClose={onClose} open={open}
-                            style={{ width: "74%" }}
+                        <MenuOutlined type="primary" onClick={() => setOpen(true)} />
+                        <Drawer placement="left" onClose={() => setOpen(false)} open={open}
+                            style={{ width: "100%" }}
                         >
                             <Menu
                                 mode="inline"
                                 openKeys={openKeys}
                                 onOpenChange={onOpenChange}
                                 style={{
-                                    width: 256,
+                                    width: 256
                                 }}
                                 items={items}
                             />
@@ -299,14 +299,18 @@ function Home() {
 
                     <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                         <div className='right-bar'>
-                            <Tooltip title={text} className='menu-icon'>
-                                <i onClick={setSide} class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-                                <calendar-plus-o onClick={setSide} />
+                            <Tooltip title={text} onClick={() => navigate('/dash')} className='menu-icon'>
+                                <i class="fa fa-home" aria-hidden="true"></i>
+                                <card-o />
+                            </Tooltip>
 
+                            <Tooltip title={text} className='menu-icon'>
+                                <i onClick={() => setSide(true)} class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                <calendar-plus-o onClick={() => setSide(true)} />
                                 <Drawer
                                     title="Quick Reservation"
                                     width={720}
-                                    onClose={onClose}
+                                    onClose={() => setSide(false)}
                                     open={side}
                                     bodyStyle={{ paddingBottom: 80 }}
                                 // extra={
@@ -320,18 +324,14 @@ function Home() {
                                 >
                                     <Form hideRequiredMark>
 
-                                       
-
-
-
                                         <div className='reservation'>
-                                         
+
                                             <Space>
 
-                                            <div>
-                                            <p>jbb</p>
-                                            <DatePicker onChange={onChange} />
-                                        </div>
+                                                <div>
+                                                    <p>jbb</p>
+                                                    <DatePicker onChange={onChange} />
+                                                </div>
                                                 <PickerWithType type={type} onChange={(value) => console.log(value)} />
 
                                                 <h5>1</h5>
@@ -342,10 +342,6 @@ function Home() {
                                 </Drawer>
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
-                                <i class="fa fa-id-card-o" aria-hidden="true"></i>
-                                <card-o />
-                            </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
                                 <i class="fa fa-calendar-o" aria-hidden="true"></i>
