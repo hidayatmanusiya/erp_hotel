@@ -1740,7 +1740,7 @@ h2 {
 
 .menu-bar {
     background: #FFF;
-    padding: 18px 10px;
+    padding: 14px 10px 7px;
     box-shadow: 0px 0px 10px 0px #888888;
 
     .ant-image {
@@ -1771,7 +1771,7 @@ h2 {
     }
 
     .menu-icon {
-        margin: 10px 13px;
+        margin: 10px 15px;
         font-size: 20px;
         cursor: pointer;
     }
@@ -1790,8 +1790,97 @@ h2 {
         border: none;
     }
 
-   
+    .reservation p {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    
 }
+
+.absolute{
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 16%);
+    padding: 3px 20px;
+    margin: 20px 0;
+
+    h6{
+        color: red;
+        border: 1px solid red;
+        padding: 6px 10px;
+        margin: 0;
+    }
+
+    p{
+        font-size: 12px;
+        line-height: 20px;
+    }
+
+    h5{
+        margin: 0;
+        cursor: pointer;
+    }
+
+    h4 a:hover{
+        color: black;  
+    }
+
+    h4{
+        margin: 0;
+    }
+
+    h5 a:hover{
+        color: black;
+    }
+}
+
+
+.reservation {
+    position: relative;
+    .check {
+        margin: 0;
+    }
+
+    .nights {
+        background: #3b6179;
+        text-align: center;
+        font-size: 10px;
+        color: #FFF;
+        margin-top: 22px;
+        padding: 0px 2px;
+    }
+
+    .time-line {
+        margin-top: 22px;
+    }
+
+    .Child {
+        background: #eceaea96;
+        padding: 10px;
+        margin-top: 10px;
+        border-bottom: 0.5px solid rgb(186 180 180);
+    }
+
+    .number{
+        color: red;
+        margin-left: 30px;
+    }
+
+    .hr-border{
+        border: 0.5px solid rgb(196 196 196);
+        margin: 20px 0;
+    }
+
+    .option{
+        position: absolute;
+        bottom: -100%;
+        width: 100%;
+
+    }
+}
+
+
 
 .dirty {
     background-color: #FFF;
@@ -1812,7 +1901,7 @@ h2 {
     }
 
     span.dot {
-        height: 25px;
+        height: 20px;
         width: 25px;
         background-color: #cfeefa82;
         border-radius: 50%;
@@ -1845,6 +1934,7 @@ h2 {
     .anticon svg {
         margin: 0 16px;
     }
+
 
 
 

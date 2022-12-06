@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Col, Row, Button, Drawer, Image, Input, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
+import { Col, Row, Button, Drawer, Image, Input, InputNumber, Modal, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
 import {
     MenuOutlined,
     ExclamationCircleOutlined,
@@ -59,6 +59,18 @@ const events = [
 ]
 
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
+const selectBefore = (
+    <Select defaultValue="Mr." className="select-before">
+        <Option value="http://">Mr.</Option>
+        <Option value="https://">Mr.</Option>
+    </Select>
+)
+
+const selectAfter = (
+    <i class="fa fa-address-card-o" aria-hidden="true"></i>
+);
+
+
 
 function getItem(label, key, icon, children, type) {
     return {
@@ -102,10 +114,18 @@ function Home() {
     const onSearch = (value) => console.log(value);
     const text = <span>prompt text</span>;
     const [open, setOpen] = useState(false);
+    const [opens, setOpens] = useState(false);
     const [menu, setMenu] = useState(false);
     const [side, setSide] = useState(false);
+    const [view, setView] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [drawer, setDrawer] = useState(false);
     const { Option, OptGroup } = Select;
     const [type, setType] = useState('time');
+
+
+
+
 
     useEffect(() => {
         if (!schedulerHelper.current) {
@@ -237,9 +257,12 @@ function Home() {
     };
 
 
+
+
     const onClose = () => {
         setOpen(false);
     };
+
 
     const handleChange = (value) => {
         console.log(`selected ${value}`);
@@ -259,6 +282,19 @@ function Home() {
             setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
         }
     };
+
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+
 
     const PickerWithType = ({ type, onChange }) => {
         if (type === 'time') return <TimePicker onChange={onChange} />;
@@ -309,34 +345,253 @@ function Home() {
                                 <calendar-plus-o onClick={() => setSide(true)} />
                                 <Drawer
                                     title="Quick Reservation"
-                                    width={720}
-                                    onClose={() => setSide(false)}
+                                    width={1000}
+                                    onClose={onClose}
                                     open={side}
                                     bodyStyle={{ paddingBottom: 80 }}
-                                // extra={
-                                //     <Space>
-                                //         <Button onClick={onClose}>Cancel</Button>
-                                //         <Button onClick={onClose} type="primary">
-                                //             Submit
-                                //         </Button>
-                                //     </Space>
-                                // }
                                 >
                                     <Form hideRequiredMark>
-
                                         <div className='reservation'>
-
                                             <Space>
-
                                                 <div>
-                                                    <p>jbb</p>
+                                                    <p className='check'>Check-in</p>
                                                     <DatePicker onChange={onChange} />
                                                 </div>
-                                                <PickerWithType type={type} onChange={(value) => console.log(value)} />
 
-                                                <h5>1</h5>
+                                                <div className='time-line'>
+                                                    <PickerWithType type={type} onChange={(value) => console.log(value)} />
+                                                </div>
+
+                                                <div className='nights'>
+                                                    <p className='check'>1</p>
+                                                    <p className='check'>Nights</p>
+                                                </div>
+
+                                                <div>
+                                                    <p className='check'>Check-out</p>
+                                                    <DatePicker onChange={onChange} />
+                                                </div>
+                                                <div className='time-line'>
+                                                    <PickerWithType type={type} onChange={(value) => console.log(value)} />
+                                                </div>
+
+                                                <div>
+                                                    <p className='check'>Room(s)</p>
+                                                    <InputNumber min={1} max={10} defaultValue={1} onChange={onChange} />
+                                                </div>
+
+                                                <div>
+                                                    <p className='check'>Reservation Type</p>
+                                                    <Select
+                                                        style={{
+                                                            width: 116,
+                                                        }}
+                                                        onChange={handleChange}
+                                                    >
+                                                        <OptGroup label="Manager">
+                                                            <Option value="jack">Jack</Option>
+                                                            <Option value="lucy">Lucy</Option>
+                                                        </OptGroup>
+                                                        <OptGroup label="Engineer">
+                                                            <Option value="Yiminghe">yiminghe</Option>
+                                                        </OptGroup>
+                                                    </Select>
+                                                </div>
+
+                                                <div>
+                                                    <p className='check'>Reservation Type</p>
+                                                    <Select
+                                                        style={{
+                                                            width: 200,
+                                                        }}
+                                                        showSearch
+                                                        placeholder="Select a person"
+                                                        optionFilterProp="children"
+                                                        onChange={onChange}
+                                                        onSearch={onSearch}
+                                                        filterOption={(input, option) =>
+                                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                                        }
+                                                        options={[
+                                                            {
+                                                                value: 'jack',
+                                                                label: 'Jack',
+                                                            },
+                                                            {
+                                                                value: 'lucy',
+                                                                label: 'Lucy',
+                                                            },
+                                                            {
+                                                                value: 'tom',
+                                                                label: 'Tom',
+                                                            },
+                                                        ]}
+                                                    />
+                                                </div>
                                             </Space>
 
+                                            <div className='Child'>
+                                                <Row>
+                                                    <Col span={4}>Room Type</Col>
+                                                    <Col span={4}>Rate Type</Col>
+                                                    <Col span={4}>Room</Col>
+                                                    <Col span={4}>Adult</Col>
+                                                    <Col span={4}>Child</Col>
+                                                    <Col span={4}>Rate(Rs)(Tax Inc.)</Col>
+                                                </Row>
+                                            </div>
+
+                                            <br />
+                                            <Space>
+                                                <Select
+                                                    style={{
+                                                        width: 170,
+                                                    }}
+                                                    showSearch
+                                                    placeholder="-Select-"
+                                                    optionFilterProp="children"
+                                                    onChange={onChange}
+                                                    onSearch={onSearch}
+                                                    filterOption={(input, option) =>
+                                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                                    }
+                                                    options={[
+                                                        {
+                                                            value: 'jack',
+                                                            label: 'Jack',
+                                                        },
+                                                        {
+                                                            value: 'lucy',
+                                                            label: 'Lucy',
+                                                        },
+                                                        {
+                                                            value: 'tom',
+                                                            label: 'Tom',
+                                                        },
+                                                    ]}
+                                                />
+
+                                                <Select
+                                                    defaultValue="-Select-"
+                                                    style={{
+                                                        width: 170,
+                                                    }}
+                                                    disabled
+                                                    options={[
+                                                        {
+                                                            value: 'lucy',
+                                                            label: 'Lucy',
+                                                        },
+                                                    ]}
+                                                />
+
+                                                <Select
+                                                    defaultValue="-Select-"
+                                                    style={{
+                                                        width: 170,
+                                                    }}
+                                                    disabled
+                                                    options={[
+                                                        {
+                                                            value: 'lucy',
+                                                            label: 'Lucy',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Select
+                                                    defaultValue="1"
+                                                    style={{
+                                                        width: 80,
+                                                    }}
+                                                    disabled
+                                                    options={[
+                                                        {
+                                                            value: 'lucy',
+                                                            label: 'Lucy',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Select
+                                                    defaultValue="0"
+                                                    style={{
+                                                        width: 80,
+                                                    }}
+                                                    disabled
+                                                    options={[
+                                                        {
+                                                            value: 'lucy',
+                                                            label: 'Lucy',
+                                                        },
+                                                    ]}
+                                                />
+
+                                                <Select
+                                                    defaultValue="lucy"
+                                                    style={{
+                                                        width: 150,
+                                                    }}
+                                                    disabled
+                                                    options={[
+                                                        {
+                                                            value: 'lucy',
+                                                            label: 'Lucy',
+                                                        },
+                                                    ]}
+                                                />
+                                            </Space>
+
+                                            <br />
+                                            <br />
+                                            <Row>
+                                                <Col span={19}>
+                                                    <Button>Add Room</Button>
+                                                </Col>
+                                                <Col span={5}>
+                                                    Total
+                                                    <span className='number'>0.00</span>
+                                                </Col>
+                                            </Row>
+                                            <div className='hr-border'></div>
+                                            <br />
+
+                                            <Space >
+                                                <div>
+                                                    <p className='check'>Guest Name</p>
+                                                    <Input
+                                                        style={{
+                                                            width: 430,
+                                                        }}
+                                                        addonBefore={selectBefore} addonAfter={selectAfter} defaultValue="mysite" />
+                                                </div>
+                                                <div>
+                                                    <p className='check'>Mobile</p>
+                                                    <Input placeholder="Mobile"
+                                                        style={{
+                                                            width: 200,
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <p className='check'>Email</p>
+                                                    <Input style={{
+                                                        width: 300,
+                                                    }}
+                                                        placeholder="Email" />
+                                                </div>
+                                            </Space>
+
+
+                                            <div className='option'>
+                                                <div className='hr-border'></div>
+                                                <Row>
+                                                    <Col span={22}>
+                                                        <Button onClick={onClose}>More option</Button>
+                                                    </Col>
+                                                    <Col span={2}>
+                                                        <Button type="primary" onClick={onClose}>Confirm</Button>
+                                                    </Col>
+                                                </Row>
+                                            </div>
                                         </div>
                                     </Form>
                                 </Drawer>
@@ -363,20 +618,49 @@ function Home() {
                                 <user-plus />
                             </Tooltip>
 
+
+
                             <Tooltip title={text} className='menu-icon'>
                                 <i class="fa fa-star" aria-hidden="true"></i>
                                 <star />
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <i class="fa fa-bullhorn" aria-hidden="true"></i>
-                                <bullhorn />
+                                <i onClick={setView} class="fa fa-bullhorn" aria-hidden="true"></i>
+                                <bullhorn onClick={setView} />
+
+                                <Drawer title="What's new in eZee Absolute" placement="right" onClose={onClose} open={view}>
+                                    <div className='absolute'>
+                                        <Space>
+                                            <h6>ENHANCEMENT</h6>
+                                            <p>28 Nov 2022</p>
+                                        </Space>
+                                        <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
+                                        <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
+                                        <h5><a href=''>Read More  <i class="fa fa-external-link" aria-hidden="true"></i></a> </h5>
+                                    </div>
+
+                                    <div className='absolute'>
+                                        <Space>
+                                            <h6>ENHANCEMENT</h6>
+                                            <p>28 Nov 2022</p>
+                                        </Space>
+                                        <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
+                                        <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
+                                        <h5><a href=''>Read More  <i class="fa fa-external-link" aria-hidden="true"></i></a> </h5>
+                                    </div>
+                                </Drawer>
                             </Tooltip>
 
+
+
                             <Tooltip title={text} className='menu-icon'>
-                                <i class="fa fa-th" aria-hidden="true"></i>
-                                <th />
+                                <i onClick={showModal} class="fa fa-th" aria-hidden="true"></i>
+                                <th onClick={showModal} />
+
+                                
                             </Tooltip>
+                            
                             <div className='vl'></div>
                             <div className='arizona'>
                                 <UserOutlined />
