@@ -5,7 +5,8 @@ import {
     ExclamationCircleOutlined,
     CalendarOutlined,
     UserOutlined,
-    AppstoreOutlined, MailOutlined, SettingOutlined
+    AppstoreOutlined, MailOutlined, SettingOutlined,
+    MoreOutlined
 } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import logo from "../Images/logo.png";
@@ -861,8 +862,8 @@ function Home() {
                         />
                         <Switch checkedChildren="Cozy" unCheckedChildren="Complit" defaultChecked />
                         <Space>
-                            <div className='bed-icon'><i  onClick={() => setRoom(true)} class="fa fa-bed" aria-hidden="true"/></div>
-                            {/* <i  class="fa fa-medkit" aria-hidden="true"></i> */}
+                            <div className='bed-icon'><i onClick={() => setRoom(true)} class="fa fa-bed" aria-hidden="true"/> </div>
+                            
                             <Drawer title="" placement="right" onClose={() => setRoom(false)} open={room}
                                 width={470}
                             >
@@ -928,7 +929,7 @@ function Home() {
                                         <div className='celnder-number'>
                                             <div className='celnder'>
                                                 <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
-                                                    <i class="fa fa-thermometer-full" aria-hidden="true"></i>
+                                                <MoreOutlined />
                                                     <thermometer-full />
                                                 </Tooltip>
                                                 <div className='day'>
@@ -955,7 +956,7 @@ function Home() {
                                         <div className='celnder-number'>
                                             <div className='celnder'>
                                                 <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
-                                                    <i class="fa fa-thermometer-full" aria-hidden="true"></i>
+                                                <MoreOutlined />
                                                     <thermometer-full />
                                                 </Tooltip>
                                                 <div className='day'>

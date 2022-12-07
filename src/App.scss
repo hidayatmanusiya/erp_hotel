@@ -1992,6 +1992,7 @@ h2 {
         color: #0068FF;
         margin: 0 10px;
         font-size: 20px;
+        cursor: pointer;
     }
 
 
@@ -2047,9 +2048,11 @@ h2 {
         right: 24px;
     }
 
-    i {
+    .anticon svg {
         position: absolute;
         right: 0;
+        font-size: 20px;
+        top: 0;
     }
 
 
