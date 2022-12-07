@@ -618,8 +618,6 @@ function Home() {
                                 <user-plus />
                             </Tooltip>
 
-
-
                             <Tooltip title={text} className='menu-icon'>
                                 <i class="fa fa-star" aria-hidden="true"></i>
                                 <star />
@@ -658,9 +656,68 @@ function Home() {
                                 <i onClick={showModal} class="fa fa-th" aria-hidden="true"></i>
                                 <th onClick={showModal} />
 
-                                
+                                <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
+                                    width={370}
+                                >
+                                    <Row>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                                <p className='icon'>AddReservation</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-fa fa-id-card-o" aria-hidden="true"></i>
+                                                <p className='icon'>Stay view</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
+
+                                                <p className='icon'>Dashboard</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                                <p className='icon'>Innalytics</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                                <p className='icon'>Room View</p>
+                                            </Space>
+                                        </Col>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                                                <p className='icon'>reservations</p>
+                                            </Space>
+
+                                            <br />
+                                            <Space>
+                                                <i class="fa fa-star" aria-hidden="true"></i>
+                                                <p className='icon'>Rates</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
+                                                <p className='icon'>AddReservation</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                                <p className='icon'>Guest Reviews</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                                <p className='icon'>Guest Statistice</p>
+                                            </Space>
+                                        </Col>
+                                    </Row>
+                                </Modal>
                             </Tooltip>
-                            
+
                             <div className='vl'></div>
                             <div className='arizona'>
                                 <UserOutlined />
