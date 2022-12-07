@@ -346,7 +346,7 @@ function Home() {
                                 <Drawer
                                     title="Quick Reservation"
                                     width={1000}
-                                    onClose={onClose}
+                                    onClose={() => setSide(false)}
                                     open={side}
                                     bodyStyle={{ paddingBottom: 80 }}
                                 >
@@ -626,10 +626,9 @@ function Home() {
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <i onClick={setView} class="fa fa-bullhorn" aria-hidden="true"></i>
-                                <bullhorn onClick={setView} />
+                                <i onClick={() => setView(true)} class="fa fa-bullhorn" aria-hidden="true"></i>
 
-                                <Drawer title="What's new in eZee Absolute" placement="right" onClose={onClose} open={view}>
+                                <Drawer title="What's new in eZee Absolute" placement="right" onClose={() => setView(false)} open={view}>
                                     <div className='absolute'>
                                         <Space>
                                             <h6>ENHANCEMENT</h6>
@@ -658,9 +657,9 @@ function Home() {
                                 <i onClick={showModal} class="fa fa-th" aria-hidden="true"></i>
                                 <th onClick={showModal} />
 
-                                
+
                             </Tooltip>
-                            
+
                             <div className='vl'></div>
                             <div className='arizona'>
                                 <UserOutlined />
