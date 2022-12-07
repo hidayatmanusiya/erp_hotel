@@ -1727,7 +1727,8 @@ h2 {
 
 // Add By Papu
 
-.navbar.navbar-light, .web-footer {
+.navbar.navbar-light,
+.web-footer {
     display: none !important;
 }
 
@@ -1788,11 +1789,13 @@ h2 {
 
     .arizona {
         padding: 3px 10px;
+
     }
 
     .ant-select:not(.ant-select-customize-input) .ant-select-selector {
         background: none;
         border: none;
+        margin-left: 10px;
     }
 
     .reservation p {
@@ -1800,52 +1803,94 @@ h2 {
         margin: 0 !important;
     }
 
-    
+    .suits {
+        background-color: rgb(208, 204, 204);
+        border-radius: 50%;
+        padding: 10px 14px;
+        margin-right: 10px;
+    }
+
+    .configuration {
+        margin: 10px 0;
+    }
+
+    .configurationas {
+        width: 20%;
+        border-radius: 6px;
+        padding: 20px 10px;
+        box-shadow: 0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 8%), 0 9px 28px 8px rgb(0 0 0 / 5%);
+
+        h5 {
+            color: gray;
+        }
+    }
+
+    .ationas {
+        border: 0.5px solid rgb(208, 204, 204);
+        margin: 16px 0;
+    }
+
+    .icon-configuration {
+        margin: 18px 0 0;
+        color: gray;
+
+        i {
+            margin-right: 10px;
+        }
+
+        span {
+            float: right;
+            cursor: pointer;
+        }
+    }
+
 }
 
-.absolute{
+
+.absolute {
     background: #fff;
     border-radius: 2px;
     box-shadow: 0 2px 4px rgb(0 0 0 / 16%);
     padding: 3px 20px;
     margin: 20px 0;
 
-    h6{
+    h6 {
         color: red;
         border: 1px solid red;
         padding: 6px 10px;
         margin: 0;
     }
 
-    p{
+    p {
         font-size: 12px;
         line-height: 20px;
     }
 
-    h5{
+    h5 {
         margin: 0;
         cursor: pointer;
     }
 
-    h4 a:hover{
-        color: black;  
+    h4 a:hover {
+        color: black;
     }
 
-    h4{
+    h4 {
         margin: 0;
     }
 
-    h5 a:hover{
+    h5 a:hover {
         color: black;
     }
 }
 
-.icon{
+.icon {
     margin: 10px 0;
 }
 
 .reservation {
     position: relative;
+
     .check {
         margin: 0;
     }
@@ -1870,32 +1915,32 @@ h2 {
         border-bottom: 0.5px solid rgb(186 180 180);
     }
 
-    .number{
+    .number {
         color: red;
         margin-left: 30px;
     }
 
-    .hr-border{
+    .hr-border {
         border: 0.5px solid rgb(196 196 196);
         margin: 20px 0;
     }
 
-    .option{
+    .option {
         position: absolute;
         bottom: -100%;
         width: 100%;
-
     }
 }
-
-
 
 .dirty {
     background-color: #FFF;
     margin: 10px;
     border-bottom: 1px solid #adafad;
     height: 55px;
-    padding-top: 11px;
+
+    .ant-row {
+        padding: 10px 0;
+    }
 
     .ant-picker {
         border: none;
@@ -1942,5 +1987,70 @@ h2 {
     .anticon svg {
         margin: 0 16px;
     }
+
+    .bed-icon {
+        color: #0068FF;
+        margin: 0 10px;
+        font-size: 20px;
+    }
+
+
+}
+
+.celnder-number {
+    background-color: #FFF;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 16%);
+}
+
+.celnder {
+    position: relative;
+    display: flex;
+    color: #000;
+
+    p {
+        margin: 0;
+    }
+
+    h5 {
+        margin: 0;
+    }
+
+    .day {
+        text-align: center;
+        background: #daeeff;
+        padding: 5px 16px;
+    }
+
+    .vl {
+        border-left: 1px solid #adafad;
+        height: 72px;
+    }
+
+    .assign {
+        border: 0.5px solid gray;
+        margin: 6px 0;
+    }
+
+    .mohamamd {
+        margin-left: 10px;
+    }
+
+    .mohamamds {
+        position: absolute;
+        left: 19%;
+    }
+
+    .ant-btn {
+        position: absolute;
+        top: 61%;
+        right: 24px;
+    }
+
+    i {
+        position: absolute;
+        right: 0;
+    }
+
 
 }

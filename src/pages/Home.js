@@ -1,16 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Col, Row, Button, Drawer, Image, Input, InputNumber, Modal, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
+import { Col, Row, Button, Drawer, Image, Input, Collapse, Carousel, InputNumber, Modal, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
 import {
     MenuOutlined,
     ExclamationCircleOutlined,
     CalendarOutlined,
-    CreditCardOutlined,
     UserOutlined,
-    StarOutlined,
-    NotificationOutlined,
-    BorderRightOutlined,
-    PlusOutlined,
-    MedicineBoxOutlined,
     AppstoreOutlined, MailOutlined, SettingOutlined
 } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
@@ -18,8 +12,16 @@ import logo from "../Images/logo.png";
 import Config from "../common/Config";
 import Schedule from "../Schedule";
 
+const { Panel } = Collapse;
 const { Option } = Select;
 let { StringHelper, DateHelper, Toast, Popup } = window.bryntum.scheduler;
+const contentStyle = {
+    margin: 0,
+    height: '160px',
+    color: '#fff',
+    textAlign: 'center',
+
+};
 
 
 const resources = [
@@ -70,8 +72,6 @@ const selectAfter = (
     <i class="fa fa-address-card-o" aria-hidden="true"></i>
 );
 
-
-
 function getItem(label, key, icon, children, type) {
     return {
         key,
@@ -81,7 +81,6 @@ function getItem(label, key, icon, children, type) {
         type,
     };
 }
-
 
 const items = [
     getItem('Front Office', 'sub1', <MailOutlined />, [
@@ -112,20 +111,17 @@ function Home() {
     const schedulerHelper = useRef();
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
-    const text = <span>prompt text</span>;
     const [open, setOpen] = useState(false);
     const [opens, setOpens] = useState(false);
     const [menu, setMenu] = useState(false);
     const [side, setSide] = useState(false);
     const [view, setView] = useState(false);
+    const [room, setRoom] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [drawer, setDrawer] = useState(false);
     const { Option, OptGroup } = Select;
     const [type, setType] = useState('time');
-
-
-
-
+    const [openKeys, setOpenKeys] = useState(['sub1']);
 
     useEffect(() => {
         if (!schedulerHelper.current) {
@@ -243,7 +239,6 @@ function Home() {
         }
     }, []);
 
-
     const showDrawer = () => {
         setOpen(true);
     };
@@ -256,24 +251,18 @@ function Home() {
         setOpen(true);
     };
 
-
-
-
     const onClose = () => {
         setOpen(false);
     };
-
 
     const handleChange = (value) => {
         console.log(`selected ${value}`);
     };
 
-
     const onChange = (date, dateString) => {
         console.log(date, dateString);
     };
 
-    const [openKeys, setOpenKeys] = useState(['sub1']);
     const onOpenChange = (keys) => {
         const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
         if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
@@ -283,24 +272,40 @@ function Home() {
         }
     };
 
-
     const showModal = () => {
         setIsModalOpen(true);
     };
+
     const handleOk = () => {
         setIsModalOpen(false);
     };
+
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-
-
 
     const PickerWithType = ({ type, onChange }) => {
         if (type === 'time') return <TimePicker onChange={onChange} />;
         if (type === 'date') return <DatePicker onChange={onChange} />;
         return <DatePicker picker={type} onChange={onChange} />;
     };
+
+
+
+
+    const text = <span>Search by Room Type, Room, Reservation No, Folio No, Bill No, Voucher No, Guest Name, Email, Mobile No, Phone No, Last 4 Digits of CC No, Group ID, Sharer name, GR Card No</span>;
+    const reservation = <span>Add Reservation</span>;
+    const stay = <span>Stay View</span>;
+    const reservations = <span>Reservations</span>;
+    const rates = <span>Rates</span>;
+    const guest = <span>Guest Portal</span>;
+    const user = <span>User Activity</span>;
+    const reputation = <span>Reputation Management</span>;
+    const product = <span>Product Update</span>;
+    const quick = <span>Quick Menu</span>;
+    const edite = <span>Quick Menu</span>;
+
+
 
 
 
@@ -311,7 +316,7 @@ function Home() {
                     <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                         <MenuOutlined type="primary" onClick={() => setOpen(true)} />
                         <Drawer placement="left" onClose={() => setOpen(false)} open={open}
-                            style={{ width: "100%" }}
+                            style={{ width: "75%" }}
                         >
                             <Menu
                                 mode="inline"
@@ -335,12 +340,12 @@ function Home() {
 
                     <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                         <div className='right-bar'>
-                            <Tooltip title={text} onClick={() => navigate('/dash')} className='menu-icon'>
+                            <Tooltip title={reservation} onClick={() => navigate('/dash')} className='menu-icon'>
                                 <i class="fa fa-home" aria-hidden="true"></i>
                                 <card-o />
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={stay} className='menu-icon'>
                                 <i onClick={() => setSide(true)} class="fa fa-calendar-plus-o" aria-hidden="true"></i>
                                 <calendar-plus-o onClick={() => setSide(true)} />
                                 <Drawer
@@ -597,33 +602,32 @@ function Home() {
                                 </Drawer>
                             </Tooltip>
 
-
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={reservations} className='menu-icon'>
                                 <i class="fa fa-calendar-o" aria-hidden="true"></i>
                                 <calendar-o />
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={rates} className='menu-icon'>
                                 <i class="fa fa-building" aria-hidden="true"></i>
                                 <building />
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={guest} className='menu-icon'>
                                 <i class="fa fa-envelope-o" aria-hidden="true"></i>
                                 <envelope-o />
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={user} className='menu-icon'>
                                 <i class="fa fa-user-plus" aria-hidden="true"></i>
                                 <user-plus />
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={reputation} className='menu-icon'>
                                 <i class="fa fa-star" aria-hidden="true"></i>
                                 <star />
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={product} className='menu-icon'>
                                 <i onClick={() => setView(true)} class="fa fa-bullhorn" aria-hidden="true"></i>
 
                                 <Drawer title="What's new in eZee Absolute" placement="right" onClose={() => setView(false)} open={view}>
@@ -651,10 +655,70 @@ function Home() {
 
 
 
-                            <Tooltip title={text} className='menu-icon'>
+                            <Tooltip title={quick} className='menu-icon'>
                                 <i onClick={showModal} class="fa fa-th" aria-hidden="true"></i>
                                 <th onClick={showModal} />
 
+                                <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
+                                    width={370}
+                                >
+                                    <Row>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                                <p className='icon'>AddReservation</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-fa fa-id-card-o" aria-hidden="true"></i>
+                                                <p className='icon'>Stay view</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
+
+                                                <p className='icon'>Dashboard</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                                <p className='icon'>Innalytics</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                                <p className='icon'>Room View</p>
+                                            </Space>
+                                        </Col>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                                                <p className='icon'>reservations</p>
+                                            </Space>
+
+                                            <br />
+                                            <Space>
+                                                <i class="fa fa-star" aria-hidden="true"></i>
+                                                <p className='icon'>Rates</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
+                                                <p className='icon'>AddReservation</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                                <p className='icon'>Guest Reviews</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                                <p className='icon'>Guest Statistice</p>
+                                            </Space>
+                                        </Col>
+                                    </Row>
+                                </Modal>
                             </Tooltip>
 
                             <div className='vl'></div>
@@ -662,24 +726,67 @@ function Home() {
                                 <UserOutlined />
                                 <Select
                                     defaultValue="Arizona Luxery Suits"
-
                                     style={{
-                                        width: 200,
+                                        width: 217,
                                     }}
                                     onChange={handleChange}
                                 >
-                                    <OptGroup label="Manager">
-                                        <Option value="jack">Jack</Option>
-                                        <Option value="lucy">Lucy</Option>
-                                    </OptGroup>
+
                                     <OptGroup label="Engineer">
                                         <Option value="Yiminghe">yiminghe</Option>
                                     </OptGroup>
+
+                                    {/* <Option>
+                                        <div className='configurationas'>
+                                            <div>
+                                                <span className='suits'>P</span>
+                                                PMSTrial@2
+                                            </div>
+                                            <div className='ationas'></div>
+
+                                            <div className='icon-configuration'>
+                                                <i class="fa fa-cog" aria-hidden="true"></i>
+                                                Go to Configuration
+                                            </div>
+
+                                            <div className='icon-configuration'>
+                                                <i class="fa fa-snowflake-o" aria-hidden="true"></i>
+                                                Go to Extranet
+                                            </div>
+                                            <div className='ationas'></div>
+                                            <h5>NEED HELP?</h5>
+
+                                            <div className='icon-configuration'>
+                                                <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                                                Report an Issue
+                                            </div>
+
+                                            <div className='icon-configuration'>
+                                                <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                                                Chat Support
+                                                <span><i class="fa fa-external-link" aria-hidden="true"></i></span>
+                                            </div>
+
+                                            <div className='icon-configuration'>
+                                                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+                                                Explore FAQs
+                                                <span><i class="fa fa-external-link" aria-hidden="true"></i></span>
+                                            </div>
+                                            <div className='ationas'></div>
+
+                                            <div className='icon-configuration'>
+                                                <i class="fa fa-power-off" aria-hidden="true"></i>
+                                                Logout
+                                            </div>
+                                        </div>
+                                    </Option> */}
                                 </Select>
                             </div>
                         </div>
                     </Col>
                 </Row>
+
+
             </div>
 
             <div className='dirty'>
@@ -726,6 +833,9 @@ function Home() {
 
                     <Col xs={{ span: 24 }} lg={{ span: 8 }}>
                         <Select
+                            style={{
+                                width: 170
+                            }}
                             showSearch
                             placeholder="Select a person"
                             optionFilterProp="children"
@@ -750,17 +860,134 @@ function Home() {
                             ]}
                         />
                         <Switch checkedChildren="Cozy" unCheckedChildren="Complit" defaultChecked />
+                        <Space>
+                            <div className='bed-icon'><i  onClick={() => setRoom(true)} class="fa fa-bed" aria-hidden="true"/></div>
+                            {/* <i  class="fa fa-medkit" aria-hidden="true"></i> */}
+                            <Drawer title="" placement="right" onClose={() => setRoom(false)} open={room}
+                                width={470}
+                            >
+                                <Space>
+                                    Assign Rooms
+                                    <DatePicker onChange={onChange} style={{ width: 43, }} />
+                                </Space>
+                                <br />
+                                <br />
+                                <Carousel afterChange={onChange} autoplay>
+                                    <div style={contentStyle}>
+                                        <div className='celnder'>
+                                            <div className='vl'></div>
+                                            <div className='day'>
+                                                <p>Sun</p>
+                                                <h5>26</h5>
+                                                <p>Dec</p>
+                                            </div>
+                                            <div className='vl'></div>
+                                            <div className='day'>
+                                                <p>Mon</p>
+                                                <h5>27</h5>
+                                                <p>Dec</p>
+                                            </div>
+                                            <div className='vl'></div>
+                                            <div className='day'>
+                                                <p>Tue</p>
+                                                <h5>28</h5>
+                                                <p>Dec</p>
+                                            </div>
+                                            <div className='vl'></div>
+                                            <div className='day'>
+                                                <p>wed</p>
+                                                <h5>29</h5>
+                                                <p>Dec</p>
+                                            </div>
+                                            <div className='vl'></div>
+                                            <div className='day'>
+                                                <p>Thu</p>
+                                                <h5>30</h5>
+                                                <p>Dec</p>
+                                            </div>
+                                            <div className='vl'></div>
+                                            <div className='day'>
+                                                <p>Fri</p>
+                                                <h5>31</h5>
+                                                <p>Dec</p>
+                                            </div>
+                                            <div className='vl'></div>
+                                            <div className='day'>
+                                                <p>Sat</p>
+                                                <h5>01</h5>
+                                                <p>Dec</p>
+                                            </div>
+                                            <div className='vl'></div>
+                                        </div>
+                                        <div className='ationas'></div>
+                                    </div>
+                                </Carousel>
+                                <br />
+                                <Collapse defaultActiveKey={['1']} onChange={onChange} style={{ border: "none" }}>
+                                    <Panel header="Kumbha Mahal Suite (1)" key="1">
+                                        <div className='celnder-number'>
+                                            <div className='celnder'>
+                                                <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
+                                                    <i class="fa fa-thermometer-full" aria-hidden="true"></i>
+                                                    <thermometer-full />
+                                                </Tooltip>
+                                                <div className='day'>
+                                                    <p>Sun</p>
+                                                    <p>Dec</p>
+                                                    <div className='assign'></div>
+                                                    <p>Sun</p>
+                                                    <p>Dec</p>
+                                                </div>
+                                                <div className='mohamamd'>
+                                                    <a href=''>Mr. mohamamd</a>
+                                                    <p>N43A76F9683B-3</p>
+                                                </div>
+                                                <Space>
+                                                    <div className='mohamamds'>
+                                                        <p>Room Type</p>
+                                                        <p>Deluxe Non AC</p>
+                                                    </div>
+                                                    <Button>Assign Room</Button>
+                                                </Space>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div className='celnder-number'>
+                                            <div className='celnder'>
+                                                <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
+                                                    <i class="fa fa-thermometer-full" aria-hidden="true"></i>
+                                                    <thermometer-full />
+                                                </Tooltip>
+                                                <div className='day'>
+                                                    <p>Sun</p>
+                                                    <p>Dec</p>
+                                                    <div className='assign'></div>
+                                                    <p>Sun</p>
+                                                    <p>Dec</p>
+                                                </div>
+                                                <div className='mohamamd'>
+                                                    <a href=''>Mr. mohamamd</a>
+                                                    <p>N43A76F9683B-3</p>
+                                                </div>
+                                                <Space>
+                                                    <div className='mohamamds'>
+                                                        <p>Room Type</p>
+                                                        <p>Deluxe Non AC</p>
+                                                    </div>
+                                                    <Button>Assign Room</Button>
+                                                </Space>
+                                            </div>
+                                        </div>
+                                    </Panel>
+                                </Collapse>
+                            </Drawer>
 
-                        {/* <MedicineBoxOutlined onClick={showDrawer}>
-                            Open
-                        </MedicineBoxOutlined>
-                        <Drawer title="Basic Drawer" placement="right" onClose={onClose} open={open}>
-                            <p>Some contents...</p>
-                            <p>Some contents...</p>
-                            <p>Some contents...</p>
-                        </Drawer> */}
+                            <ExclamationCircleOutlined />
 
-                        <ExclamationCircleOutlined />
+
+
+
+                        </Space>
 
                     </Col>
                 </Row>
@@ -768,6 +995,8 @@ function Home() {
                 <div id="container"></div>
 
             </div>
+
+
 
         </>
     );
