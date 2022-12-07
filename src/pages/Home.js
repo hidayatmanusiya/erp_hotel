@@ -325,7 +325,7 @@ function Home() {
                         </Drawer>
                         <Image preview={false}
                             width={150}
-                            src={logo}
+                            src={'https://staybird.in/wp-content/uploads/2022/05/updated_logo.png.webp'}
                         />
                         <Search placeholder="input search text" onSearch={onSearch} enterButton />
                         <Tooltip title={text} className='icon'>
