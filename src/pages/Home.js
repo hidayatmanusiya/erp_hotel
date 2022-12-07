@@ -13,6 +13,7 @@ import {
     MedicineBoxOutlined,
     AppstoreOutlined, MailOutlined, SettingOutlined
 } from '@ant-design/icons';
+import { useNavigate } from "react-router-dom";
 import logo from "../Images/logo.png";
 import Config from "../common/Config";
 import Schedule from "../Schedule";
@@ -107,6 +108,7 @@ const items = [
 ];
 
 function Home() {
+    const navigate = useNavigate();
     const schedulerHelper = useRef();
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
@@ -307,18 +309,16 @@ function Home() {
             <div className="menu-bar">
                 <Row>
                     <Col xs={{ span: 24 }} lg={{ span: 12 }}>
-                        <MenuOutlined type="primary" onClick={showMenu}
-
-                        />
-                        <Drawer placement="left" onClose={onClose} open={open}
-                            style={{ width: "74%" }}
+                        <MenuOutlined type="primary" onClick={() => setOpen(true)} />
+                        <Drawer placement="left" onClose={() => setOpen(false)} open={open}
+                            style={{ width: "100%" }}
                         >
                             <Menu
                                 mode="inline"
                                 openKeys={openKeys}
                                 onOpenChange={onOpenChange}
                                 style={{
-                                    width: 256,
+                                    width: 256
                                 }}
                                 items={items}
                             />
@@ -335,14 +335,18 @@ function Home() {
 
                     <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                         <div className='right-bar'>
-                            <Tooltip title={text} className='menu-icon'>
-                                <i onClick={setSide} class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-                                <calendar-plus-o onClick={setSide} />
+                            <Tooltip title={text} onClick={() => navigate('/dash')} className='menu-icon'>
+                                <i class="fa fa-home" aria-hidden="true"></i>
+                                <card-o />
+                            </Tooltip>
 
+                            <Tooltip title={text} className='menu-icon'>
+                                <i onClick={() => setSide(true)} class="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                <calendar-plus-o onClick={() => setSide(true)} />
                                 <Drawer
                                     title="Quick Reservation"
                                     width={1000}
-                                    onClose={onClose}
+                                    onClose={() => setSide(false)}
                                     open={side}
                                     bodyStyle={{ paddingBottom: 80 }}
                                 >
@@ -593,10 +597,6 @@ function Home() {
                                 </Drawer>
                             </Tooltip>
 
-                            <Tooltip title={text} className='menu-icon'>
-                                <i class="fa fa-id-card-o" aria-hidden="true"></i>
-                                <card-o />
-                            </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
                                 <i class="fa fa-calendar-o" aria-hidden="true"></i>
@@ -624,10 +624,9 @@ function Home() {
                             </Tooltip>
 
                             <Tooltip title={text} className='menu-icon'>
-                                <i onClick={setView} class="fa fa-bullhorn" aria-hidden="true"></i>
-                                <bullhorn onClick={setView} />
+                                <i onClick={() => setView(true)} class="fa fa-bullhorn" aria-hidden="true"></i>
 
-                                <Drawer title="What's new in eZee Absolute" placement="right" onClose={onClose} open={view}>
+                                <Drawer title="What's new in eZee Absolute" placement="right" onClose={() => setView(false)} open={view}>
                                     <div className='absolute'>
                                         <Space>
                                             <h6>ENHANCEMENT</h6>
@@ -656,66 +655,6 @@ function Home() {
                                 <i onClick={showModal} class="fa fa-th" aria-hidden="true"></i>
                                 <th onClick={showModal} />
 
-                                <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
-                                    width={370}
-                                >
-                                    <Row>
-                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
-                                            <Space>
-                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-                                                <p className='icon'>AddReservation</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-fa fa-id-card-o" aria-hidden="true"></i>
-                                                <p className='icon'>Stay view</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
-
-                                                <p className='icon'>Dashboard</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-line-chart" aria-hidden="true"></i>
-                                                <p className='icon'>Innalytics</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-                                                <p className='icon'>Room View</p>
-                                            </Space>
-                                        </Col>
-                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
-                                            <Space>
-                                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
-                                                <p className='icon'>reservations</p>
-                                            </Space>
-
-                                            <br />
-                                            <Space>
-                                                <i class="fa fa-star" aria-hidden="true"></i>
-                                                <p className='icon'>Rates</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
-                                                <p className='icon'>AddReservation</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                                <p className='icon'>Guest Reviews</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-user" aria-hidden="true"></i>
-                                                <p className='icon'>Guest Statistice</p>
-                                            </Space>
-                                        </Col>
-                                    </Row>
-                                </Modal>
                             </Tooltip>
 
                             <div className='vl'></div>

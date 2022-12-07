@@ -1727,6 +1727,11 @@ h2 {
 
 // Add By Papu
 
+.navbar.navbar-light, .web-footer {
+    display: none !important;
+}
+
+
 #container {
     position: relative;
     flex: 1;
@@ -1937,9 +1942,5 @@ h2 {
     .anticon svg {
         margin: 0 16px;
     }
-
-
-
-
 
 }
