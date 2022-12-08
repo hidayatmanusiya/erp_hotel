@@ -6,10 +6,12 @@ import {
     CalendarOutlined,
     UserOutlined,
     AppstoreOutlined, MailOutlined, SettingOutlined,
-    MoreOutlined
+    MoreOutlined,
+    TeamOutlined,
+    CoffeeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import logo from "../images/logo.png";
+import logo from "../Images/logo.png";
 import Config from "../common/Config";
 import Schedule from "../Schedule";
 
@@ -773,6 +775,8 @@ function Home() {
 
             </div>
 
+
+
             <div className='dirty'>
                 <Row>
                     <Col xs={{ span: 24 }} lg={{ span: 16 }}>
@@ -911,9 +915,14 @@ function Home() {
                                     <Panel header="Kumbha Mahal Suite (1)" key="1">
                                         <div className='celnder-number'>
                                             <div className='celnder'>
-                                                <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
+
+                                                <Tooltip title={<div>
+                                                    <h5>text 1</h5>
+                                                    <h5>text 1</h5>
+                                                    <h5>text 1</h5>
+                                                    <h5>text 1</h5>
+                                                </div>} className='icon'>
                                                     <MoreOutlined />
-                                                    <thermometer-full />
                                                 </Tooltip>
                                                 <div className='day'>
                                                     <p>Sun</p>
@@ -938,9 +947,13 @@ function Home() {
                                         <br />
                                         <div className='celnder-number'>
                                             <div className='celnder'>
-                                                <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
+                                                <Tooltip title={<div>
+                                                    <h5>text 1</h5>
+                                                    <h5>text 1</h5>
+                                                    <h5>text 1</h5>
+                                                    <h5>text 1</h5>
+                                                </div>} className='icon'>
                                                     <MoreOutlined />
-                                                    <thermometer-full />
                                                 </Tooltip>
                                                 <div className='day'>
                                                     <p>Sun</p>
@@ -965,8 +978,98 @@ function Home() {
                                     </Panel>
                                 </Collapse>
                             </Drawer>
+                            <Tooltip className='icon' title={<div>
+                                <div className='room'>
+                                    <h5>Room Indicators</h5>
+                                    <div className='indicators'></div>
 
-                            <Tooltip title={<div>Make Html...</div>} className='icon'>
+                                    <Row>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <i class="fa fa-usd" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Payment Due</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Guest Message</p>
+                                            </Space>
+
+                                            <Space>
+                                            <TeamOutlined />
+                                                <p className='room-Booking'>Group Booking</p>
+                                            </Space>
+
+                                            <Space>
+                                            <CoffeeOutlined />
+                                                <p className='room-Booking'>Smoking</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-wrench" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Maintenance</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-link" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Connected Rooms</p>
+                                            </Space>
+                                        </Col>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <i class="fa fa-cutlery" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Meal Plan</p>
+                                            </Space>
+
+                                            <br />
+                                            <Space>
+                                            <i class="fa fa-gift" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Group Owner</p>
+                                            </Space>
+
+                                            <Space>
+                                            <CoffeeOutlined />
+                                                <p className='room-Booking'>Non Smoking</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Next Reservation</p>
+                                            </Space>
+
+                                            <Space>
+                                                <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                                                <p className='room-Booking'>Work Order</p>
+                                            </Space>
+                                        </Col>
+
+                                    </Row>
+                                    <h5>Room Types</h5>
+                                    <div className='indicators'></div>
+                                    <Row>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <span class="label success"></span>
+                                                <p className='room-Booking'>Guest Bed Room</p>
+                                            </Space>
+
+
+                                        </Col>
+                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                            <Space>
+                                                <span class="label danger"></span>
+                                                <p className='room-Booking'>Kumbha Mahal Suite</p>
+                                            </Space>
+
+
+
+
+                                        </Col>
+                                    </Row>
+
+
+                                </div>
+                            </div>}>
                                 <ExclamationCircleOutlined />
                             </Tooltip>
 

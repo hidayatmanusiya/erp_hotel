@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 // import logo from "../images/logo.phg";
 
-import CanvasJSReact from '../images/canvasjs/canvasjs.react';
+import CanvasJSReact from '../Images/canvasjs/canvasjs.react';
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
