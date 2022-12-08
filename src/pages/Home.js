@@ -9,13 +9,13 @@ import {
     MoreOutlined
 } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import logo from "../Images/logo.png";
+import logo from "../images/logo.png";
 import Config from "../common/Config";
 import Schedule from "../Schedule";
 
 const { Panel } = Collapse;
 const { Option } = Select;
-let { StringHelper, DateHelper, Toast, Popup } = window.bryntum.scheduler;
+let { StringHelper, DateHelper, Toast } = window.bryntum.scheduler;
 const contentStyle = {
     margin: 0,
     height: '160px',
@@ -240,17 +240,6 @@ function Home() {
         }
     }, []);
 
-    const showDrawer = () => {
-        setOpen(true);
-    };
-
-    const showSearch = () => {
-        setSide(true);
-    };
-
-    const showMenu = () => {
-        setOpen(true);
-    };
 
     const onClose = () => {
         setOpen(false);
@@ -291,9 +280,6 @@ function Home() {
         return <DatePicker picker={type} onChange={onChange} />;
     };
 
-
-
-
     const text = <span>Search by Room Type, Room, Reservation No, Folio No, Bill No, Voucher No, Guest Name, Email, Mobile No, Phone No, Last 4 Digits of CC No, Group ID, Sharer name, GR Card No</span>;
     const reservation = <span>Add Reservation</span>;
     const stay = <span>Stay View</span>;
@@ -305,9 +291,6 @@ function Home() {
     const product = <span>Product Update</span>;
     const quick = <span>Quick Menu</span>;
     const edite = <span>Quick Menu</span>;
-
-
-
 
 
     return (
@@ -862,8 +845,8 @@ function Home() {
                         />
                         <Switch checkedChildren="Cozy" unCheckedChildren="Complit" defaultChecked />
                         <Space>
-                            <div className='bed-icon'><i onClick={() => setRoom(true)} class="fa fa-bed" aria-hidden="true"/> </div>
-                            
+                            <div className='bed-icon'><i onClick={() => setRoom(true)} class="fa fa-bed" aria-hidden="true" /> </div>
+
                             <Drawer title="" placement="right" onClose={() => setRoom(false)} open={room}
                                 width={470}
                             >
@@ -929,7 +912,7 @@ function Home() {
                                         <div className='celnder-number'>
                                             <div className='celnder'>
                                                 <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
-                                                <MoreOutlined />
+                                                    <MoreOutlined />
                                                     <thermometer-full />
                                                 </Tooltip>
                                                 <div className='day'>
@@ -956,7 +939,7 @@ function Home() {
                                         <div className='celnder-number'>
                                             <div className='celnder'>
                                                 <Tooltip title={edite} onClick={() => navigate('/dash')} className='menu-icon'>
-                                                <MoreOutlined />
+                                                    <MoreOutlined />
                                                     <thermometer-full />
                                                 </Tooltip>
                                                 <div className='day'>
@@ -983,10 +966,9 @@ function Home() {
                                 </Collapse>
                             </Drawer>
 
-                            <ExclamationCircleOutlined />
-
-
-
+                            <Tooltip title={<div>Make Html...</div>} className='icon'>
+                                <ExclamationCircleOutlined />
+                            </Tooltip>
 
                         </Space>
 
