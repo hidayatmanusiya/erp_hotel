@@ -11,9 +11,10 @@ import {
     CoffeeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import logo from "../Images/logo.png";
-import Config from "../common/Config";
+import logo from "../images/logo.png";
+import config from "../common/config";
 import Schedule from "../Schedule";
+import { useGet } from "../hooks/useFetch";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -23,45 +24,7 @@ const contentStyle = {
     height: '160px',
     color: '#fff',
     textAlign: 'center',
-
 };
-
-
-const resources = [
-    { id: 11, name: 'Angelo' },
-    { id: 12, name: 'Gloria' },
-    { id: 13, name: 'Madison' },
-    { id: 14, name: 'Malik' },
-    { id: 15, name: 'Mark' },
-    { id: 16, name: 'Rob' }
-]
-
-const events = [
-    {
-        id: 11,
-        resourceId: 11,
-        name: 'Implement Feature X',
-        startDate: new Date(2022, 0, 11, 28),
-        duration: 2,
-        durationUnit: 'h'
-    },
-    {
-        id: 12,
-        resourceId: 12,
-        name: 'Refactoring',
-        startDate: new Date(2022, 0, 11, 30),
-        duration: 2,
-        durationUnit: 'h'
-    },
-    {
-        id: 13,
-        resourceId: 16,
-        name: 'Write application tests',
-        startDate: new Date(2022, 0, 12, 1),
-        duration: 2,
-        durationUnit: 'h'
-    }
-]
 
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
 const selectBefore = (
@@ -72,46 +35,17 @@ const selectBefore = (
 )
 
 const selectAfter = (
-    <i class="fa fa-address-card-o" aria-hidden="true"></i>
+    <i className="fa fa-address-card-o" aria-hidden="true"></i>
 );
 
-function getItem(label, key, icon, children, type) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-        type,
-    };
-}
-
-const items = [
-    getItem('Front Office', 'sub1', <MailOutlined />, [
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Reports', '1', <MailOutlined />),
-    ]),
-    getItem('Cashiering', 'sub2', <AppstoreOutlined />, [
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Submenu', 'sub3', null, [getItem('Option 7', '7'), getItem('Option 8', '8')]),
-    ]),
-    getItem('Housekeeping', 'sub4', <SettingOutlined />, [
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Reports', '1', <MailOutlined />),
-        getItem('Reports', '1', <MailOutlined />),
-    ]),
-    getItem('Reports', '1', <MailOutlined />),
-    getItem('Net Locks', '2', <CalendarOutlined />),
-    getItem('Night Audit Log', '2', <CalendarOutlined />),
-
-];
 
 function Home() {
     const navigate = useNavigate();
     const schedulerHelper = useRef();
+    // let [data, callData] = useGet('api/method/bizmap_hotel.utill.api.fetch_data', { "from_date": "2022-12-09", "to_date": "2022-12-12" })
+    const [todayStatus, setTodayStatus] = useState({ all: 0, vacant: 0, occupied: 0, reserved: 0, blocked: 0, dueOut: 0, dirty: 0 });
+    const [companys, setCompanys] = useState([]);
+
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
     const [open, setOpen] = useState(false);
@@ -125,6 +59,64 @@ function Home() {
     const { Option, OptGroup } = Select;
     const [type, setType] = useState('time');
     const [openKeys, setOpenKeys] = useState(['sub1']);
+
+    const columns = [
+        {
+            text: 'Status',
+            field: 'status',
+            tooltip: 'Status',
+            sortable: false,
+            width: 20,
+            region: 'left',
+            htmlEncode: false,
+            // renderer: ({ record }) => {
+            //     let roomStatus = JSON.parse(window.sessionStorage.getItem('roomStatus'))
+            //     if (roomStatus) {
+            //         const status = roomStatus.filter(element => element.name == record.status);
+            //         return `<div className="capacity b-fa b-fa-${status[0]?.icon}"></div>`;
+            //     }
+            //     return ''
+            // },
+            // editor: {
+            //     type: 'combo',
+            //     valueField: 'status',
+            //     items: ['Out Of Order', 'Availabel', 'Dirty', 'Occupied'],
+            //     editable: false,
+            //     listeners: {
+            //         select: (e) => {
+            //             ChangeRoomStatus(e?.source?.initialValue, e?.record?.data?.text)
+            //         },
+            //     },
+            // }
+        },
+        {
+            text: 'Room Type', tooltip: 'Room Type', field: 'room_type_name', width: 100, region: 'left', sortable: false
+        },
+        {
+            text: `Room No`, tooltip: 'Room No', editor: null, field: 'room_no', width: 100, region: 'left', sortable: false, id: "room_column"
+        },
+    ]
+
+    const localTooltips = {
+        header: {
+            titleAlign: 'start'
+        },
+        onBeforeShow({ source: tooltip }) {
+            tooltip.title = tooltip?.eventRecord?.name
+        },
+        template: data => {
+            let newData = data.eventRecord.data
+            return `<dl>
+            <dt>Contact:  <b>${newData?.contact ? newData?.contact : ''}</b></dt>
+            <dt>Company:  <b>${newData?.company ? newData?.company : ''}</b></dt>
+            <dt>Room NO:  <b>${newData?.room_no ? newData?.room_no : ''}</b></dt>
+            <dt>Room Package:  <b>${newData?.room_package ? newData?.room_package : ''}</b></dt>
+            <dt>Remark:  <b>${newData?.remark}</b></dt>
+            <dt>Check In/Out: <b>${DateHelper.format(data.eventRecord.startDate, 'ddd MM/DD')} - ${DateHelper.format(data.eventRecord.endDate, 'ddd MM/DD')}</b></dt>
+        </dl>
+        `
+        }
+    }
 
     useEffect(() => {
         if (!schedulerHelper.current) {
@@ -142,17 +134,11 @@ function Home() {
                     eventDrag: {
                         disabled: true
                     },
-                    // eventTooltip: localTooltips,
-                    group: 'room_type_name',
+                    eventTooltip: localTooltips,
+                    group: 'room_type',
                     // eventEdit: EventEdit,
                 },
-                columns: [
-                    {
-                        type: 'resourceInfo',
-                        text: 'Stockholm office',
-                        width: '15em'
-                    }
-                ],
+                columns: columns,
                 // rowHeight: 20,
                 viewPreset: {
                     base: 'weekAndMonth',
@@ -177,9 +163,8 @@ function Home() {
                             Toast.show("Booking can't make in previous date");
                             return false;
                         } else {
-
-                            // popup.show();
-                            // return false;
+                            setSide(true)
+                            return false;
                         }
                     },
                     beforeEventAdd({ source, eventRecord }) {
@@ -191,16 +176,16 @@ function Home() {
                             Toast.show("Booking can't make in previous date");
                             return false;
                         } else {
-
-                            // return false;
+                            setSide(true)
+                            return false;
                         }
                     },
                     beforeEventEdit({ eventRecord, editor }) {
                         if (eventRecord.data.idx == 0) {
                             if (eventRecord.data.check_in) {
-                                window.open(Config.siteUrl + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
+                                window.open(config.siteUrl + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
                             } else {
-                                window.open(Config.siteUrl + "/app/sales-order/" + eventRecord.data.name, '_blank');
+                                window.open(config.siteUrl + "/app/sales-order/" + eventRecord.data.name, '_blank');
                             }
                             return false
                         }
@@ -235,12 +220,1048 @@ function Home() {
 
 
             });
-            const schedule = window.bryntum.get('scheduler');
-            console.log(schedule)
-            schedule.resourceStore.data = resources
-            schedule.eventStore.data = events
+            searchData()
         }
     }, []);
+
+    const searchData = () => {
+        const schedule = window.bryntum.get('scheduler');
+        let todayStatus = { all: 0, vacant: 0, Occupied: 0, reserved: 0, blocked: 0, dueOut: 0, dirty: 0 }
+        let companys = []
+        let resources = []
+        let events = []
+        let data = [
+            {
+                "company_name": "Magnus Hotels",
+                "company_abbreviation": "MH",
+                "properties": {
+                    "Star Residency": {
+                        "Property_abbreviation": "SR",
+                        "RoomType": {
+                            "Deluxe": {
+                                "Room_abbreviation": "DX",
+                                "RoomNumbers": {
+                                    "111": {
+                                        "CurrentStatus": "Dirty",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "13/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "DNR",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "14/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "112": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "14/12/2022",
+                                                "to": "19/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "Super Deluxe": {
+                                "Room_abbreviation": "SD",
+                                "RoomNumbers": {
+                                    "113": {
+                                        "CurrentStatus": "Out Of Order",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "13/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "13/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "114": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "06/12/2022",
+                                                "to": "10/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "Square": {
+                        "Property_abbreviation": "SQ",
+                        "RoomType": {
+                            "Deluxe": {
+                                "Room_abbreviation": "DX",
+                                "RoomNumbers": {
+                                    "111": {
+                                        "CurrentStatus": "Dirty",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "10/12/2022",
+                                                "to": "12/12/2022",
+                                                "BookingType": "DNR",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "12/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "112": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "06/12/2022",
+                                                "to": "10/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "Super Deluxe": {
+                                "Room_abbreviation": "SD",
+                                "RoomNumbers": {
+                                    "113": {
+                                        "CurrentStatus": "Out Of Order",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "10/12/2022",
+                                                "to": "12/12/2022",
+                                                "BookingType": "",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "12/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "114": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "06/12/2022",
+                                                "to": "10/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "company_name": "Stay Bird",
+                "company_abbreviation": "SB",
+                "properties": {
+                    "B-Suite": {
+                        "Property_abbreviation": "BS",
+                        "RoomType": {
+                            "Deluxe": {
+                                "Room_abbreviation": "DX",
+                                "RoomNumbers": {
+                                    "111": {
+                                        "CurrentStatus": "Dirty",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "10/12/2022",
+                                                "to": "12/12/2022",
+                                                "BookingType": "DNR",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "12/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "112": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "06/12/2022",
+                                                "to": "10/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "Super Deluxe": {
+                                "Room_abbreviation": "SD",
+                                "RoomNumbers": {
+                                    "113": {
+                                        "CurrentStatus": "Out Of Order",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "10/12/2022",
+                                                "to": "12/12/2022",
+                                                "BookingType": "",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "12/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "114": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "06/12/2022",
+                                                "to": "10/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "Icon-Bliss": {
+                        "Property_abbreviation": "IB",
+                        "RoomType": {
+                            "Deluxe": {
+                                "Room_abbreviation": "DX",
+                                "RoomNumbers": {
+                                    "111": {
+                                        "CurrentStatus": "Dirty",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "10/12/2022",
+                                                "to": "12/12/2022",
+                                                "BookingType": "DNR",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "12/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "112": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "06/12/2022",
+                                                "to": "10/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "Super Deluxe": {
+                                "Room_abbreviation": "SD",
+                                "RoomNumbers": {
+                                    "113": {
+                                        "CurrentStatus": "Out Of Order",
+                                        "NonSmoking": 0,
+                                        "BedType": "King Size",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "10/12/2022",
+                                                "to": "12/12/2022",
+                                                "BookingType": "",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "RamPrasad",
+                                                "ContactNumber": "9898213441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "2",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "2",
+                                                    "7"
+                                                ],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Booking.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 2000,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "12/12/2022",
+                                                "to": "15/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Corporate",
+                                                "GuestName": "Nikhil Jain",
+                                                "GuestContactNumber": "9898213441",
+                                                "CompanyName": "ABCD pvt ltd",
+                                                "Number of Guest": "1",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "Corportae",
+                                                "Room Package": "CORP-Delux",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 1,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "09:00:00 12/12/2022",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    },
+                                    "114": {
+                                        "CurrentStatus": "Occupied",
+                                        "NonSmoking": 1,
+                                        "BedType": "Twin Sharing",
+                                        "RoomLedger": [
+                                            {
+                                                "From": "06/12/2022",
+                                                "to": "10/12/2022",
+                                                "BookingType": "Booked",
+                                                "BookingCategory": "Individual",
+                                                "GuestName": "Mohan Das",
+                                                "ContactNumber": "9893143441",
+                                                "CompanyName": "",
+                                                "Number of Guest": "3",
+                                                "WithKids": 1,
+                                                "KidsAge": [
+                                                    "9"
+                                                ],
+                                                "Extra Bed": "1",
+                                                "Booking From": "MMT.com",
+                                                "Room Package": "ABCD",
+                                                "Advance Paid": 0,
+                                                "TerrifBill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Many More Fields Can Come",
+                                                "Expected Arrival": "Not Mentioned",
+                                                "isEarlyCheck-in": 1,
+                                                "chargableEarlyCheckin": 1,
+                                                "isDayUse": 0
+                                            },
+                                            {
+                                                "From": "15/12/2022",
+                                                "to": "20/12/2022",
+                                                "BookingType": "Reserved",
+                                                "BookingCategory": "Hold",
+                                                "GuestName": "",
+                                                "GuestContactNumber": "",
+                                                "CompanyName": "",
+                                                "Number of Guest": "",
+                                                "WithKids": 0,
+                                                "KidsAge": [],
+                                                "Extra Bed": "Not Mentioned",
+                                                "Booking From": "",
+                                                "Room Package": "",
+                                                "Advance Paid": 0,
+                                                "Bill2Company": 0,
+                                                "ExtrasBill2Company": 0,
+                                                "Remark": "Blocked For Special Days",
+                                                "Expected Arrival": "",
+                                                "isEarlyCheck-in": 0,
+                                                "chargableEarlyCheckin": 0,
+                                                "isDayUse": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+        // console.log(schedule)
+        // callData()
+
+        for (let company of data) {
+            // console.log(company)
+            companys.push({
+                value: company.company_name,
+                label: company.company_name,
+            })
+            let properties = company.properties
+            for (let propertie in properties) {
+                let roomTypes = properties[propertie].RoomType
+                // console.log(propertie)
+                // console.log(roomTypes)
+                for (let roomType in roomTypes) {
+                    let rooms = roomTypes[roomType].RoomNumbers
+                    // console.log(roomType)
+                    // console.log(rooms)
+                    for (let room in rooms) {
+                        let roomDet = rooms[room]
+                        let roomLedger = rooms[room].RoomLedger
+                        let ID = `${room}_${(propertie).replaceAll(' ', '_').toLowerCase()}_${company.company_abbreviation}`
+                        resources.push({
+                            company: company.company_name,
+                            propertie: propertie,
+                            room_type: roomType,
+                            room_type_name: `${company.company_abbreviation} : ${propertie}`,
+                            status: roomDet.CurrentStatus,
+                            id: ID,
+                            room_no: room,
+                        })
+                        // console.log(room)
+                        // console.log(roomDet)
+                        for (let ledger of roomLedger) {
+                            // console.log(ledger)
+                            events.push({
+                                // id: 11,
+                                resourceId: ID,
+                                name: ledger.GuestName,
+                                contact: ledger.ContactNumber,
+                                company: company.company_name,
+                                room_no: room,
+                                room_package: ledger['Room Package'],
+                                remark: ledger.Remark,
+                                startDate: new Date(ledger.From),
+                                // endDate: new Date(ledger.to),
+                                duration: 2,
+                                // durationUnit: 'h'
+                            },)
+                        }
+                        let type = roomDet.CurrentStatus
+                        todayStatus[type] = todayStatus[type] ? Number(todayStatus[type]) + 1 : 0
+                    }
+                }
+
+            }
+
+        }
+        setCompanys(companys)
+        schedule.resourceStore.data = resources
+        schedule.eventStore.data = events
+        setTodayStatus(todayStatus)
+        // console.log(events)
+    };
+
+    // console.log(data)
+
+    const findGuest = (text) => {
+        console.log(text)
+    }
 
 
     const onClose = () => {
@@ -299,8 +1320,8 @@ function Home() {
         <>
             <div className="menu-bar">
                 <Row>
-                    <Col xs={{ span: 24 }} lg={{ span: 12 }}>
-                        <MenuOutlined type="primary" onClick={() => setOpen(true)} />
+                    <Col xs={{ span: 24 }} lg={{ span: 13 }}>
+                        {/* <MenuOutlined type="primary" onClick={() => setOpen(true)} />
                         <Drawer placement="left" onClose={() => setOpen(false)} open={open}
                             style={{ width: "75%" }}
                         >
@@ -313,90 +1334,136 @@ function Home() {
                                 }}
                                 items={items}
                             />
-                        </Drawer>
+                        </Drawer> */}
                         <Image preview={false}
                             width={150}
                             src={logo}
                         />
-                        <Search placeholder="input search text" onSearch={onSearch} enterButton />
+                        <Search placeholder="Find Guest" onSearch={findGuest} enterButton />
                         <Tooltip title={text} className='icon'>
                             <ExclamationCircleOutlined />
                         </Tooltip>
+                        Mon, Dec 12, 2022 9:19:55 PM
                     </Col>
 
-                    <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                    <Col xs={{ span: 24 }} lg={{ span: 11 }}>
+
                         <div className='right-bar'>
-                            <Tooltip title={reservation} onClick={() => navigate('/dash')} className='menu-icon'>
-                                <i class="fa fa-home" aria-hidden="true"></i>
-                                <card-o />
-                            </Tooltip>
+                            <div className='vl'></div>
+                            <div className='arizona'>
+                                <Tooltip title={'Go to Home'} onClick={() => navigate('/dash')} className='menu-icon'>
+                                    <i className="fa fa-home" aria-hidden="true"></i>
+                                    <card-o />
+                                </Tooltip>
 
-                            <Tooltip title={stay} className='menu-icon'>
-                                <i onClick={() => setSide(true)} class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-                                <calendar-plus-o onClick={() => setSide(true)} />
-                                <Drawer
-                                    title="Quick Reservation"
-                                    width={1000}
-                                    onClose={() => setSide(false)}
-                                    open={side}
-                                    bodyStyle={{ paddingBottom: 80 }}
-                                >
-                                    <Form hideRequiredMark>
-                                        <div className='reservation'>
-                                            <Space>
-                                                <div>
-                                                    <p className='check'>Check-in</p>
-                                                    <DatePicker onChange={onChange} />
+                                <Tooltip title={'Add Booking'} className='menu-icon'>
+                                    <i onClick={() => setSide(true)} className="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                    <Drawer
+                                        title="Quick Reservation"
+                                        width={1000}
+                                        onClose={() => setSide(false)}
+                                        open={side}
+                                        bodyStyle={{ paddingBottom: 80 }}
+                                    >
+                                        <Form>
+                                            <div className='reservation'>
+                                                <Space>
+                                                    <div>
+                                                        <p className='check'>Check-in</p>
+                                                        <DatePicker onChange={onChange} />
+                                                    </div>
+
+                                                    <div className='time-line'>
+                                                        <PickerWithType type={type} onChange={(value) => console.log(value)} />
+                                                    </div>
+
+                                                    <div className='nights'>
+                                                        <p className='check'>1</p>
+                                                        <p className='check'>Nights</p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p className='check'>Check-out</p>
+                                                        <DatePicker onChange={onChange} />
+                                                    </div>
+                                                    <div className='time-line'>
+                                                        <PickerWithType type={type} onChange={(value) => console.log(value)} />
+                                                    </div>
+
+                                                    <div>
+                                                        <p className='check'>Room(s)</p>
+                                                        <InputNumber min={1} max={10} defaultValue={1} onChange={onChange} />
+                                                    </div>
+
+                                                    <div>
+                                                        <p className='check'>Reservation Type</p>
+                                                        <Select
+                                                            style={{
+                                                                width: 116,
+                                                            }}
+                                                            onChange={handleChange}
+                                                        >
+                                                            <OptGroup label="Manager">
+                                                                <Option value="jack">Jack</Option>
+                                                                <Option value="lucy">Lucy</Option>
+                                                            </OptGroup>
+                                                            <OptGroup label="Engineer">
+                                                                <Option value="Yiminghe">yiminghe</Option>
+                                                            </OptGroup>
+                                                        </Select>
+                                                    </div>
+
+                                                    <div>
+                                                        <p className='check'>Reservation Type</p>
+                                                        <Select
+                                                            style={{
+                                                                width: 200,
+                                                            }}
+                                                            showSearch
+                                                            placeholder="Select a person"
+                                                            optionFilterProp="children"
+                                                            onChange={onChange}
+                                                            onSearch={onSearch}
+                                                            filterOption={(input, option) =>
+                                                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                                            }
+                                                            options={[
+                                                                {
+                                                                    value: 'jack',
+                                                                    label: 'Jack',
+                                                                },
+                                                                {
+                                                                    value: 'lucy',
+                                                                    label: 'Lucy',
+                                                                },
+                                                                {
+                                                                    value: 'tom',
+                                                                    label: 'Tom',
+                                                                },
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                </Space>
+
+                                                <div className='Child'>
+                                                    <Row>
+                                                        <Col span={4}>Room Type</Col>
+                                                        <Col span={4}>Rate Type</Col>
+                                                        <Col span={4}>Room</Col>
+                                                        <Col span={4}>Adult</Col>
+                                                        <Col span={4}>Child</Col>
+                                                        <Col span={4}>Rate(Rs)(Tax Inc.)</Col>
+                                                    </Row>
                                                 </div>
 
-                                                <div className='time-line'>
-                                                    <PickerWithType type={type} onChange={(value) => console.log(value)} />
-                                                </div>
-
-                                                <div className='nights'>
-                                                    <p className='check'>1</p>
-                                                    <p className='check'>Nights</p>
-                                                </div>
-
-                                                <div>
-                                                    <p className='check'>Check-out</p>
-                                                    <DatePicker onChange={onChange} />
-                                                </div>
-                                                <div className='time-line'>
-                                                    <PickerWithType type={type} onChange={(value) => console.log(value)} />
-                                                </div>
-
-                                                <div>
-                                                    <p className='check'>Room(s)</p>
-                                                    <InputNumber min={1} max={10} defaultValue={1} onChange={onChange} />
-                                                </div>
-
-                                                <div>
-                                                    <p className='check'>Reservation Type</p>
+                                                <br />
+                                                <Space>
                                                     <Select
                                                         style={{
-                                                            width: 116,
-                                                        }}
-                                                        onChange={handleChange}
-                                                    >
-                                                        <OptGroup label="Manager">
-                                                            <Option value="jack">Jack</Option>
-                                                            <Option value="lucy">Lucy</Option>
-                                                        </OptGroup>
-                                                        <OptGroup label="Engineer">
-                                                            <Option value="Yiminghe">yiminghe</Option>
-                                                        </OptGroup>
-                                                    </Select>
-                                                </div>
-
-                                                <div>
-                                                    <p className='check'>Reservation Type</p>
-                                                    <Select
-                                                        style={{
-                                                            width: 200,
+                                                            width: 170,
                                                         }}
                                                         showSearch
-                                                        placeholder="Select a person"
+                                                        placeholder="-Select-"
                                                         optionFilterProp="children"
                                                         onChange={onChange}
                                                         onSearch={onSearch}
@@ -418,356 +1485,250 @@ function Home() {
                                                             },
                                                         ]}
                                                     />
-                                                </div>
-                                            </Space>
 
-                                            <div className='Child'>
-                                                <Row>
-                                                    <Col span={4}>Room Type</Col>
-                                                    <Col span={4}>Rate Type</Col>
-                                                    <Col span={4}>Room</Col>
-                                                    <Col span={4}>Adult</Col>
-                                                    <Col span={4}>Child</Col>
-                                                    <Col span={4}>Rate(Rs)(Tax Inc.)</Col>
-                                                </Row>
-                                            </div>
-
-                                            <br />
-                                            <Space>
-                                                <Select
-                                                    style={{
-                                                        width: 170,
-                                                    }}
-                                                    showSearch
-                                                    placeholder="-Select-"
-                                                    optionFilterProp="children"
-                                                    onChange={onChange}
-                                                    onSearch={onSearch}
-                                                    filterOption={(input, option) =>
-                                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                                    }
-                                                    options={[
-                                                        {
-                                                            value: 'jack',
-                                                            label: 'Jack',
-                                                        },
-                                                        {
-                                                            value: 'lucy',
-                                                            label: 'Lucy',
-                                                        },
-                                                        {
-                                                            value: 'tom',
-                                                            label: 'Tom',
-                                                        },
-                                                    ]}
-                                                />
-
-                                                <Select
-                                                    defaultValue="-Select-"
-                                                    style={{
-                                                        width: 170,
-                                                    }}
-                                                    disabled
-                                                    options={[
-                                                        {
-                                                            value: 'lucy',
-                                                            label: 'Lucy',
-                                                        },
-                                                    ]}
-                                                />
-
-                                                <Select
-                                                    defaultValue="-Select-"
-                                                    style={{
-                                                        width: 170,
-                                                    }}
-                                                    disabled
-                                                    options={[
-                                                        {
-                                                            value: 'lucy',
-                                                            label: 'Lucy',
-                                                        },
-                                                    ]}
-                                                />
-                                                <Select
-                                                    defaultValue="1"
-                                                    style={{
-                                                        width: 80,
-                                                    }}
-                                                    disabled
-                                                    options={[
-                                                        {
-                                                            value: 'lucy',
-                                                            label: 'Lucy',
-                                                        },
-                                                    ]}
-                                                />
-                                                <Select
-                                                    defaultValue="0"
-                                                    style={{
-                                                        width: 80,
-                                                    }}
-                                                    disabled
-                                                    options={[
-                                                        {
-                                                            value: 'lucy',
-                                                            label: 'Lucy',
-                                                        },
-                                                    ]}
-                                                />
-
-                                                <Select
-                                                    defaultValue="lucy"
-                                                    style={{
-                                                        width: 150,
-                                                    }}
-                                                    disabled
-                                                    options={[
-                                                        {
-                                                            value: 'lucy',
-                                                            label: 'Lucy',
-                                                        },
-                                                    ]}
-                                                />
-                                            </Space>
-
-                                            <br />
-                                            <br />
-                                            <Row>
-                                                <Col span={19}>
-                                                    <Button>Add Room</Button>
-                                                </Col>
-                                                <Col span={5}>
-                                                    Total
-                                                    <span className='number'>0.00</span>
-                                                </Col>
-                                            </Row>
-                                            <div className='hr-border'></div>
-                                            <br />
-
-                                            <Space >
-                                                <div>
-                                                    <p className='check'>Guest Name</p>
-                                                    <Input
+                                                    <Select
+                                                        defaultValue="-Select-"
                                                         style={{
-                                                            width: 430,
+                                                            width: 170,
                                                         }}
-                                                        addonBefore={selectBefore} addonAfter={selectAfter} defaultValue="mysite" />
-                                                </div>
-                                                <div>
-                                                    <p className='check'>Mobile</p>
-                                                    <Input placeholder="Mobile"
-                                                        style={{
-                                                            width: 200,
-                                                        }}
+                                                        disabled
+                                                        options={[
+                                                            {
+                                                                value: 'lucy',
+                                                                label: 'Lucy',
+                                                            },
+                                                        ]}
                                                     />
-                                                </div>
-                                                <div>
-                                                    <p className='check'>Email</p>
-                                                    <Input style={{
-                                                        width: 300,
-                                                    }}
-                                                        placeholder="Email" />
-                                                </div>
-                                            </Space>
 
+                                                    <Select
+                                                        defaultValue="-Select-"
+                                                        style={{
+                                                            width: 170,
+                                                        }}
+                                                        disabled
+                                                        options={[
+                                                            {
+                                                                value: 'lucy',
+                                                                label: 'Lucy',
+                                                            },
+                                                        ]}
+                                                    />
+                                                    <Select
+                                                        defaultValue="1"
+                                                        style={{
+                                                            width: 80,
+                                                        }}
+                                                        disabled
+                                                        options={[
+                                                            {
+                                                                value: 'lucy',
+                                                                label: 'Lucy',
+                                                            },
+                                                        ]}
+                                                    />
+                                                    <Select
+                                                        defaultValue="0"
+                                                        style={{
+                                                            width: 80,
+                                                        }}
+                                                        disabled
+                                                        options={[
+                                                            {
+                                                                value: 'lucy',
+                                                                label: 'Lucy',
+                                                            },
+                                                        ]}
+                                                    />
 
-                                            <div className='option'>
-                                                <div className='hr-border'></div>
+                                                    <Select
+                                                        defaultValue="lucy"
+                                                        style={{
+                                                            width: 150,
+                                                        }}
+                                                        disabled
+                                                        options={[
+                                                            {
+                                                                value: 'lucy',
+                                                                label: 'Lucy',
+                                                            },
+                                                        ]}
+                                                    />
+                                                </Space>
+
+                                                <br />
+                                                <br />
                                                 <Row>
-                                                    <Col span={22}>
-                                                        <Button onClick={onClose}>More option</Button>
+                                                    <Col span={19}>
+                                                        <Button>Add Room</Button>
                                                     </Col>
-                                                    <Col span={2}>
-                                                        <Button type="primary" onClick={onClose}>Confirm</Button>
+                                                    <Col span={5}>
+                                                        Total
+                                                        <span className='number'>0.00</span>
                                                     </Col>
                                                 </Row>
+                                                <div className='hr-border'></div>
+                                                <br />
+
+                                                <Space >
+                                                    <div>
+                                                        <p className='check'>Guest Name</p>
+                                                        <Input
+                                                            style={{
+                                                                width: 430,
+                                                            }}
+                                                            addonBefore={selectBefore} addonAfter={selectAfter} defaultValue="mysite" />
+                                                    </div>
+                                                    <div>
+                                                        <p className='check'>Mobile</p>
+                                                        <Input placeholder="Mobile"
+                                                            style={{
+                                                                width: 200,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <p className='check'>Email</p>
+                                                        <Input style={{
+                                                            width: 300,
+                                                        }}
+                                                            placeholder="Email" />
+                                                    </div>
+                                                </Space>
+
+
+                                                <div className='option'>
+                                                    <div className='hr-border'></div>
+                                                    <Row>
+                                                        <Col span={22}>
+                                                            <Button onClick={onClose}>More option</Button>
+                                                        </Col>
+                                                        <Col span={2}>
+                                                            <Button type="primary" onClick={onClose}>Confirm</Button>
+                                                        </Col>
+                                                    </Row>
+                                                </div>
                                             </div>
+                                        </Form>
+                                    </Drawer>
+                                </Tooltip>
+
+
+
+                                <Tooltip title={product} className='menu-icon'>
+                                    <i onClick={() => setView(true)} className="fa fa-bullhorn" aria-hidden="true"></i>
+
+                                    <Drawer title="What's new in eZee Absolute" placement="right" onClose={() => setView(false)} open={view}>
+                                        <div className='absolute'>
+                                            <Space>
+                                                <h6>ENHANCEMENT</h6>
+                                                <p>28 Nov 2022</p>
+                                            </Space>
+                                            <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
+                                            <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
+                                            <h5><a href=''>Read More  <i className="fa fa-external-link" aria-hidden="true"></i></a> </h5>
                                         </div>
-                                    </Form>
-                                </Drawer>
-                            </Tooltip>
 
-                            <Tooltip title={reservations} className='menu-icon'>
-                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
-                                <calendar-o />
-                            </Tooltip>
-
-                            <Tooltip title={rates} className='menu-icon'>
-                                <i class="fa fa-building" aria-hidden="true"></i>
-                                <building />
-                            </Tooltip>
-
-                            <Tooltip title={guest} className='menu-icon'>
-                                <i class="fa fa-envelope-o" aria-hidden="true"></i>
-                                <envelope-o />
-                            </Tooltip>
-
-                            <Tooltip title={user} className='menu-icon'>
-                                <i class="fa fa-user-plus" aria-hidden="true"></i>
-                                <user-plus />
-                            </Tooltip>
-
-                            <Tooltip title={reputation} className='menu-icon'>
-                                <i class="fa fa-star" aria-hidden="true"></i>
-                                <star />
-                            </Tooltip>
-
-                            <Tooltip title={product} className='menu-icon'>
-                                <i onClick={() => setView(true)} class="fa fa-bullhorn" aria-hidden="true"></i>
-
-                                <Drawer title="What's new in eZee Absolute" placement="right" onClose={() => setView(false)} open={view}>
-                                    <div className='absolute'>
-                                        <Space>
-                                            <h6>ENHANCEMENT</h6>
-                                            <p>28 Nov 2022</p>
-                                        </Space>
-                                        <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
-                                        <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
-                                        <h5><a href=''>Read More  <i class="fa fa-external-link" aria-hidden="true"></i></a> </h5>
-                                    </div>
-
-                                    <div className='absolute'>
-                                        <Space>
-                                            <h6>ENHANCEMENT</h6>
-                                            <p>28 Nov 2022</p>
-                                        </Space>
-                                        <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
-                                        <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
-                                        <h5><a href=''>Read More  <i class="fa fa-external-link" aria-hidden="true"></i></a> </h5>
-                                    </div>
-                                </Drawer>
-                            </Tooltip>
-
-
-
-                            <Tooltip title={quick} className='menu-icon'>
-                                <i onClick={showModal} class="fa fa-th" aria-hidden="true"></i>
-                                <th onClick={showModal} />
-
-                                <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
-                                    width={370}
-                                >
-                                    <Row>
-                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                        <div className='absolute'>
                                             <Space>
-                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-                                                <p className='icon'>AddReservation</p>
+                                                <h6>ENHANCEMENT</h6>
+                                                <p>28 Nov 2022</p>
                                             </Space>
-
-                                            <Space>
-                                                <i class="fa fa-fa fa-id-card-o" aria-hidden="true"></i>
-                                                <p className='icon'>Stay view</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
-
-                                                <p className='icon'>Dashboard</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-line-chart" aria-hidden="true"></i>
-                                                <p className='icon'>Innalytics</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-calendar-plus-o" aria-hidden="true"></i>
-                                                <p className='icon'>Room View</p>
-                                            </Space>
-                                        </Col>
-                                        <Col xs={{ span: 24 }} lg={{ span: 12 }}>
-                                            <Space>
-                                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
-                                                <p className='icon'>reservations</p>
-                                            </Space>
-
-                                            <br />
-                                            <Space>
-                                                <i class="fa fa-star" aria-hidden="true"></i>
-                                                <p className='icon'>Rates</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-tachometer" aria-hidden="true"></i>
-                                                <p className='icon'>AddReservation</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                                <p className='icon'>Guest Reviews</p>
-                                            </Space>
-
-                                            <Space>
-                                                <i class="fa fa-user" aria-hidden="true"></i>
-                                                <p className='icon'>Guest Statistice</p>
-                                            </Space>
-                                        </Col>
-                                    </Row>
-                                </Modal>
-                            </Tooltip>
-
-                            <div className='vl'></div>
-                            <div className='arizona'>
-                                <UserOutlined />
-                                <Select
-                                    defaultValue="Arizona Luxery Suits"
-                                    style={{
-                                        width: 217,
-                                    }}
-                                    onChange={handleChange}
-                                >
-
-                                    <OptGroup label="Engineer">
-                                        <Option value="Yiminghe">yiminghe</Option>
-                                    </OptGroup>
-
-                                    {/* <Option>
-                                        <div className='configurationas'>
-                                            <div>
-                                                <span className='suits'>P</span>
-                                                PMSTrial@2
-                                            </div>
-                                            <div className='ationas'></div>
-
-                                            <div className='icon-configuration'>
-                                                <i class="fa fa-cog" aria-hidden="true"></i>
-                                                Go to Configuration
-                                            </div>
-
-                                            <div className='icon-configuration'>
-                                                <i class="fa fa-snowflake-o" aria-hidden="true"></i>
-                                                Go to Extranet
-                                            </div>
-                                            <div className='ationas'></div>
-                                            <h5>NEED HELP?</h5>
-
-                                            <div className='icon-configuration'>
-                                                <i class="fa fa-envelope-o" aria-hidden="true"></i>
-                                                Report an Issue
-                                            </div>
-
-                                            <div className='icon-configuration'>
-                                                <i class="fa fa-commenting-o" aria-hidden="true"></i>
-                                                Chat Support
-                                                <span><i class="fa fa-external-link" aria-hidden="true"></i></span>
-                                            </div>
-
-                                            <div className='icon-configuration'>
-                                                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
-                                                Explore FAQs
-                                                <span><i class="fa fa-external-link" aria-hidden="true"></i></span>
-                                            </div>
-                                            <div className='ationas'></div>
-
-                                            <div className='icon-configuration'>
-                                                <i class="fa fa-power-off" aria-hidden="true"></i>
-                                                Logout
-                                            </div>
+                                            <h4><a href=''>Searching reservations becomes even easier in our reservation lists.</a> </h4>
+                                            <p>Hotels requires a reservation list for different operational use in order to know about the reservations coming or the guest arriving every day. We have provided various filterations for our users to search the reservations in the reservation list i.e. by reservation date, arrival date, room type etc. However, our users were having difficulty searching ...</p>
+                                            <h5><a href=''>Read More  <i className="fa fa-external-link" aria-hidden="true"></i></a> </h5>
                                         </div>
-                                    </Option> */}
-                                </Select>
+                                    </Drawer>
+                                </Tooltip>
+
+
+
+                                <Tooltip title={quick} className='menu-icon'>
+                                    <i onClick={showModal} className="fa fa-th" aria-hidden="true"></i>
+                                    <th onClick={showModal} />
+
+                                    <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
+                                        width={370}
+                                    >
+                                        <Row>
+                                            <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                                <Space>
+                                                    <i className="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                                    <p className='icon'>AddReservation</p>
+                                                </Space>
+
+                                                <Space>
+                                                    <i className="fa fa-fa fa-id-card-o" aria-hidden="true"></i>
+                                                    <p className='icon'>Stay view</p>
+                                                </Space>
+
+                                                <Space>
+                                                    <i className="fa fa-tachometer" aria-hidden="true"></i>
+
+                                                    <p className='icon'>Dashboard</p>
+                                                </Space>
+
+                                                <Space>
+                                                    <i className="fa fa-line-chart" aria-hidden="true"></i>
+                                                    <p className='icon'>Innalytics</p>
+                                                </Space>
+
+                                                <Space>
+                                                    <i className="fa fa-calendar-plus-o" aria-hidden="true"></i>
+                                                    <p className='icon'>Room View</p>
+                                                </Space>
+                                            </Col>
+                                            <Col xs={{ span: 24 }} lg={{ span: 12 }}>
+                                                <Space>
+                                                    <i className="fa fa-calendar-o" aria-hidden="true"></i>
+                                                    <p className='icon'>reservations</p>
+                                                </Space>
+
+                                                <br />
+                                                <Space>
+                                                    <i className="fa fa-star" aria-hidden="true"></i>
+                                                    <p className='icon'>Rates</p>
+                                                </Space>
+
+                                                <Space>
+                                                    <i className="fa fa-tachometer" aria-hidden="true"></i>
+                                                    <p className='icon'>AddReservation</p>
+                                                </Space>
+
+                                                <Space>
+                                                    <i className="fa fa-thumbs-up" aria-hidden="true"></i>
+                                                    <p className='icon'>Guest Reviews</p>
+                                                </Space>
+
+                                                <Space>
+                                                    <i className="fa fa-user" aria-hidden="true"></i>
+                                                    <p className='icon'>Guest Statistice</p>
+                                                </Space>
+                                            </Col>
+                                        </Row>
+                                    </Modal>
+                                </Tooltip>
                             </div>
+                            <div className='vl'></div>
+
+                            <div className='arizona'>
+                                <div className="btn-group btn-group-sm">
+                                    <button type="button" className="btn btn-primary">Today</button>
+                                    <button type="button" className="btn btn-primary">Week</button>
+                                    <button type="button" className="btn btn-primary">Month</button>
+                                </div>
+                            </div>
+
+                            <div className='arizona'>
+                                <div className="btn-group btn-group-sm">
+                                    <button type="button" className="btn btn-primary">{'<'}</button>
+                                    <DatePicker onChange={onChange} picker="Date" />
+                                    <button type="button" className="btn btn-primary">{'>'}</button>
+                                </div>
+
+
+                            </div>
+
+
                         </div>
                     </Col>
                 </Row>
@@ -780,42 +1741,39 @@ function Home() {
             <div className='dirty'>
                 <Row>
                     <Col xs={{ span: 24 }} lg={{ span: 16 }}>
-                        <DatePicker onChange={onChange} picker="week" />
-                        <span className='vl'></span>
-
                         <span className='all-number'>
                             <span>All</span>
-                            <span className="dot">58</span>
+                            <span className="dot">{todayStatus.all}</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Vacant</span>
-                            <span className="dot">55</span>
+                            <span className="dot">{todayStatus.vacant}</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Occupied</span>
-                            <span className="dot">1</span>
+                            <span className="dot">{todayStatus.Occupied}</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Reserved</span>
-                            <span className="dot">0</span>
+                            <span className="dot">{todayStatus.reserved}</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Blocked</span>
-                            <span className="dot">2</span>
+                            <span className="dot">{todayStatus.blocked}</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Due Out</span>
-                            <span className="dot">0</span>
+                            <span className="dot">{todayStatus['Out Of Order']}</span>
                         </span>
 
                         <span className='all-number'>
                             <span>Dirty</span>
-                            <span className="dot">9</span>
+                            <span className="dot">{todayStatus.Dirty}</span>
                         </span>
                     </Col>
 
@@ -825,31 +1783,18 @@ function Home() {
                                 width: 170
                             }}
                             showSearch
-                            placeholder="Select a person"
+                            placeholder="Select Companys"
                             optionFilterProp="children"
                             onChange={onChange}
                             onSearch={onSearch}
                             filterOption={(input, option) =>
                                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                             }
-                            options={[
-                                {
-                                    value: 'jack',
-                                    label: 'Jack',
-                                },
-                                {
-                                    value: 'lucy',
-                                    label: 'Lucy',
-                                },
-                                {
-                                    value: 'tom',
-                                    label: 'Tom',
-                                },
-                            ]}
+                            options={companys}
                         />
                         <Switch checkedChildren="Cozy" unCheckedChildren="Complit" defaultChecked />
                         <Space>
-                            <div className='bed-icon'><i onClick={() => setRoom(true)} class="fa fa-bed" aria-hidden="true" /> </div>
+                            <div className='bed-icon'><i onClick={() => setRoom(true)} className="fa fa-bed" aria-hidden="true" /> </div>
 
                             <Drawer title="" placement="right" onClose={() => setRoom(false)} open={room}
                                 width={470}
@@ -986,59 +1931,59 @@ function Home() {
                                     <Row>
                                         <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                                             <Space>
-                                                <i class="fa fa-usd" aria-hidden="true"></i>
+                                                <i className="fa fa-usd" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Payment Due</p>
                                             </Space>
 
                                             <Space>
-                                                <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                                                <i className="fa fa-commenting-o" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Guest Message</p>
                                             </Space>
 
                                             <Space>
-                                            <TeamOutlined />
+                                                <TeamOutlined />
                                                 <p className='room-Booking'>Group Booking</p>
                                             </Space>
 
                                             <Space>
-                                            <CoffeeOutlined />
+                                                <CoffeeOutlined />
                                                 <p className='room-Booking'>Smoking</p>
                                             </Space>
 
                                             <Space>
-                                                <i class="fa fa-wrench" aria-hidden="true"></i>
+                                                <i className="fa fa-wrench" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Maintenance</p>
                                             </Space>
 
                                             <Space>
-                                                <i class="fa fa-link" aria-hidden="true"></i>
+                                                <i className="fa fa-link" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Connected Rooms</p>
                                             </Space>
                                         </Col>
                                         <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                                             <Space>
-                                                <i class="fa fa-cutlery" aria-hidden="true"></i>
+                                                <i className="fa fa-cutlery" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Meal Plan</p>
                                             </Space>
 
                                             <br />
                                             <Space>
-                                            <i class="fa fa-gift" aria-hidden="true"></i>
+                                                <i className="fa fa-gift" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Group Owner</p>
                                             </Space>
 
                                             <Space>
-                                            <CoffeeOutlined />
+                                                <CoffeeOutlined />
                                                 <p className='room-Booking'>Non Smoking</p>
                                             </Space>
 
                                             <Space>
-                                                <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                                                <i className="fa fa-calendar-o" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Next Reservation</p>
                                             </Space>
 
                                             <Space>
-                                                <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                                                <i className="fa fa-check-square-o" aria-hidden="true"></i>
                                                 <p className='room-Booking'>Work Order</p>
                                             </Space>
                                         </Col>
@@ -1049,7 +1994,7 @@ function Home() {
                                     <Row>
                                         <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                                             <Space>
-                                                <span class="label success"></span>
+                                                <span className="label success"></span>
                                                 <p className='room-Booking'>Guest Bed Room</p>
                                             </Space>
 
@@ -1057,7 +2002,7 @@ function Home() {
                                         </Col>
                                         <Col xs={{ span: 24 }} lg={{ span: 12 }}>
                                             <Space>
-                                                <span class="label danger"></span>
+                                                <span className="label danger"></span>
                                                 <p className='room-Booking'>Kumbha Mahal Suite</p>
                                             </Space>
 

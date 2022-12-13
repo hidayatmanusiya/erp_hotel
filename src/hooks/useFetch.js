@@ -40,9 +40,9 @@ export function useFetch({ path, method, data, start }) {
 }
 
 
-export function useGet(data) {
+export function useGet(path, data) {
     const [start, setStart] = useState(false);
-    const res = useFetch({ path: '', method: "POST", data, start });
+    const res = useFetch({ path, method: "POST", data, start });
     let value = { ...res, data: res?.data?.message }
     setTimeout(() => setStart(false), 0)
     return [value, setStart];
