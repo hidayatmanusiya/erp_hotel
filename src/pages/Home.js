@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Col, Row, Button, Drawer, Image, Input, Collapse, Carousel, InputNumber, Modal, Tooltip, Select, Space, Form, DatePicker, Switch, Menu, TimePicker } from 'antd';
+import { Col, Row, Button, Drawer, Image, Input, Collapse, Carousel, InputNumber, Modal, Tooltip, Select, Space, Form, DatePicker, AutoComplete, TimePicker } from 'antd';
 import {
     MenuOutlined,
     ExclamationCircleOutlined,
@@ -11,11 +11,12 @@ import {
     CoffeeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import logo from "../images/logo.png";
 import config from "../common/config";
 import Schedule from "../Schedule";
-import { useGet } from "../hooks/useFetch";
-
+import { usePostApi } from "../hooks/useFetch";
+import { apiPostCall, apiPutCall } from '../hooks/SiteAPIs'
+import moment from 'moment';
+import dayjs from 'dayjs';
 const { Panel } = Collapse;
 const { Option } = Select;
 let { StringHelper, DateHelper, Toast } = window.bryntum.scheduler;
@@ -25,6 +26,8 @@ const contentStyle = {
     color: '#fff',
     textAlign: 'center',
 };
+
+const dateFormat = 'YYYY/MM/DD';
 
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
 const selectBefore = (
@@ -41,10 +44,16 @@ const selectAfter = (
 
 function Home() {
     const navigate = useNavigate();
+    const timer = useRef(null);
     const schedulerHelper = useRef();
-    // let [data, callData] = useGet('api/method/bizmap_hotel.utill.api.fetch_data', { "from_date": "2022-12-09", "to_date": "2022-12-12" })
-    const [todayStatus, setTodayStatus] = useState({ all: 0, vacant: 0, occupied: 0, reserved: 0, blocked: 0, dueOut: 0, dirty: 0 });
+    const [startDate, setStartDate] = useState(new Date());
+    const Edate = new Date()
+    const [endDate, setEndDate] = useState(new Date(Edate.setDate(Edate.getDate() + 7)));
+    const [currentType, setCurrentType] = useState('week');
+    let allData = usePostApi('/api/method/bizmap_hotel.utill.api.fetch_data', JSON.stringify({ "from_date": config.formatDate(startDate), "to_date": config.formatDate(endDate) }))
+    const [todayStatus, setTodayStatus] = useState({ all: 0, vacant: 0, Occupied: 0, reserved: 0, blocked: 0, ['Out Of Order']: 0, Dirty: 0 });
     const [companys, setCompanys] = useState([]);
+    const [guests, setGuests] = useState([]);
 
     const { Search } = Input;
     const onSearch = (value) => console.log(value);
@@ -59,6 +68,13 @@ function Home() {
     const { Option, OptGroup } = Select;
     const [type, setType] = useState('time');
     const [openKeys, setOpenKeys] = useState(['sub1']);
+
+    useEffect(() => {
+        if (allData.data) {
+            filterData(allData.data)
+        }
+    }, [allData]);
+
 
     const columns = [
         {
@@ -220,983 +236,30 @@ function Home() {
 
 
             });
-            searchData()
+            // searchData()
         }
+
+        if (document.getElementById("today_date")) {
+            let todayDate = document.getElementById("today_date");
+            let date = config.formatTodayDateTime(new Date())
+            todayDate.innerHTML = date
+        }
+        setInterval(() => {
+            if (document.getElementById("today_date")) {
+                let todayDate = document.getElementById("today_date");
+                let date = config.formatTodayDateTime(new Date())
+                todayDate.innerHTML = date
+            }
+        }, 1000);
     }, []);
 
-    const searchData = () => {
+    const filterData = (data) => {
         const schedule = window.bryntum.get('scheduler');
-        let todayStatus = { all: 0, vacant: 0, Occupied: 0, reserved: 0, blocked: 0, dueOut: 0, dirty: 0 }
+        let todayStatus = { all: 0, Availabel: 0, vacant: 0, Occupied: 0, reserved: 0, blocked: 0, ['Out Of Order']: 0, Dirty: 0 }
         let companys = []
         let resources = []
         let events = []
-        let data = [
-            {
-                "company_name": "Magnus Hotels",
-                "company_abbreviation": "MH",
-                "properties": {
-                    "Star Residency": {
-                        "Property_abbreviation": "SR",
-                        "RoomType": {
-                            "Deluxe": {
-                                "Room_abbreviation": "DX",
-                                "RoomNumbers": {
-                                    "111": {
-                                        "CurrentStatus": "Dirty",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "13/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "DNR",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "14/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "112": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "14/12/2022",
-                                                "to": "19/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            },
-                            "Super Deluxe": {
-                                "Room_abbreviation": "SD",
-                                "RoomNumbers": {
-                                    "113": {
-                                        "CurrentStatus": "Out Of Order",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "13/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "13/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "114": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "06/12/2022",
-                                                "to": "10/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "Square": {
-                        "Property_abbreviation": "SQ",
-                        "RoomType": {
-                            "Deluxe": {
-                                "Room_abbreviation": "DX",
-                                "RoomNumbers": {
-                                    "111": {
-                                        "CurrentStatus": "Dirty",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "10/12/2022",
-                                                "to": "12/12/2022",
-                                                "BookingType": "DNR",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "12/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "112": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "06/12/2022",
-                                                "to": "10/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            },
-                            "Super Deluxe": {
-                                "Room_abbreviation": "SD",
-                                "RoomNumbers": {
-                                    "113": {
-                                        "CurrentStatus": "Out Of Order",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "10/12/2022",
-                                                "to": "12/12/2022",
-                                                "BookingType": "",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "12/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "114": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "06/12/2022",
-                                                "to": "10/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                "company_name": "Stay Bird",
-                "company_abbreviation": "SB",
-                "properties": {
-                    "B-Suite": {
-                        "Property_abbreviation": "BS",
-                        "RoomType": {
-                            "Deluxe": {
-                                "Room_abbreviation": "DX",
-                                "RoomNumbers": {
-                                    "111": {
-                                        "CurrentStatus": "Dirty",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "10/12/2022",
-                                                "to": "12/12/2022",
-                                                "BookingType": "DNR",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "12/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "112": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "06/12/2022",
-                                                "to": "10/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            },
-                            "Super Deluxe": {
-                                "Room_abbreviation": "SD",
-                                "RoomNumbers": {
-                                    "113": {
-                                        "CurrentStatus": "Out Of Order",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "10/12/2022",
-                                                "to": "12/12/2022",
-                                                "BookingType": "",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "12/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "114": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "06/12/2022",
-                                                "to": "10/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "Icon-Bliss": {
-                        "Property_abbreviation": "IB",
-                        "RoomType": {
-                            "Deluxe": {
-                                "Room_abbreviation": "DX",
-                                "RoomNumbers": {
-                                    "111": {
-                                        "CurrentStatus": "Dirty",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "10/12/2022",
-                                                "to": "12/12/2022",
-                                                "BookingType": "DNR",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "12/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "112": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "06/12/2022",
-                                                "to": "10/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            },
-                            "Super Deluxe": {
-                                "Room_abbreviation": "SD",
-                                "RoomNumbers": {
-                                    "113": {
-                                        "CurrentStatus": "Out Of Order",
-                                        "NonSmoking": 0,
-                                        "BedType": "King Size",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "10/12/2022",
-                                                "to": "12/12/2022",
-                                                "BookingType": "",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "RamPrasad",
-                                                "ContactNumber": "9898213441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "2",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "2",
-                                                    "7"
-                                                ],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Booking.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 2000,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "12/12/2022",
-                                                "to": "15/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Corporate",
-                                                "GuestName": "Nikhil Jain",
-                                                "GuestContactNumber": "9898213441",
-                                                "CompanyName": "ABCD pvt ltd",
-                                                "Number of Guest": "1",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "Corportae",
-                                                "Room Package": "CORP-Delux",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 1,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "09:00:00 12/12/2022",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    },
-                                    "114": {
-                                        "CurrentStatus": "Occupied",
-                                        "NonSmoking": 1,
-                                        "BedType": "Twin Sharing",
-                                        "RoomLedger": [
-                                            {
-                                                "From": "06/12/2022",
-                                                "to": "10/12/2022",
-                                                "BookingType": "Booked",
-                                                "BookingCategory": "Individual",
-                                                "GuestName": "Mohan Das",
-                                                "ContactNumber": "9893143441",
-                                                "CompanyName": "",
-                                                "Number of Guest": "3",
-                                                "WithKids": 1,
-                                                "KidsAge": [
-                                                    "9"
-                                                ],
-                                                "Extra Bed": "1",
-                                                "Booking From": "MMT.com",
-                                                "Room Package": "ABCD",
-                                                "Advance Paid": 0,
-                                                "TerrifBill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Many More Fields Can Come",
-                                                "Expected Arrival": "Not Mentioned",
-                                                "isEarlyCheck-in": 1,
-                                                "chargableEarlyCheckin": 1,
-                                                "isDayUse": 0
-                                            },
-                                            {
-                                                "From": "15/12/2022",
-                                                "to": "20/12/2022",
-                                                "BookingType": "Reserved",
-                                                "BookingCategory": "Hold",
-                                                "GuestName": "",
-                                                "GuestContactNumber": "",
-                                                "CompanyName": "",
-                                                "Number of Guest": "",
-                                                "WithKids": 0,
-                                                "KidsAge": [],
-                                                "Extra Bed": "Not Mentioned",
-                                                "Booking From": "",
-                                                "Room Package": "",
-                                                "Advance Paid": 0,
-                                                "Bill2Company": 0,
-                                                "ExtrasBill2Company": 0,
-                                                "Remark": "Blocked For Special Days",
-                                                "Expected Arrival": "",
-                                                "isEarlyCheck-in": 0,
-                                                "chargableEarlyCheckin": 0,
-                                                "isDayUse": 0
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        ]
-        // console.log(schedule)
-        // callData()
-
         for (let company of data) {
-            // console.log(company)
             companys.push({
                 value: company.company_name,
                 label: company.company_name,
@@ -1204,12 +267,8 @@ function Home() {
             let properties = company.properties
             for (let propertie in properties) {
                 let roomTypes = properties[propertie].RoomType
-                // console.log(propertie)
-                // console.log(roomTypes)
                 for (let roomType in roomTypes) {
                     let rooms = roomTypes[roomType].RoomNumbers
-                    // console.log(roomType)
-                    // console.log(rooms)
                     for (let room in rooms) {
                         let roomDet = rooms[room]
                         let roomLedger = rooms[room].RoomLedger
@@ -1223,10 +282,7 @@ function Home() {
                             id: ID,
                             room_no: room,
                         })
-                        // console.log(room)
-                        // console.log(roomDet)
                         for (let ledger of roomLedger) {
-                            // console.log(ledger)
                             events.push({
                                 // id: 11,
                                 resourceId: ID,
@@ -1237,32 +293,90 @@ function Home() {
                                 room_package: ledger['Room Package'],
                                 remark: ledger.Remark,
                                 startDate: new Date(ledger.From),
-                                // endDate: new Date(ledger.to),
                                 duration: 2,
-                                // durationUnit: 'h'
                             },)
                         }
                         let type = roomDet.CurrentStatus
-                        todayStatus[type] = todayStatus[type] ? Number(todayStatus[type]) + 1 : 0
+                        todayStatus[type] = (todayStatus[type] || todayStatus[type] == 0) ? Number(todayStatus[type]) + 1 : 0
                     }
                 }
-
             }
 
         }
         setCompanys(companys)
+        // console.log(resources)
+        // console.log(events)
         schedule.resourceStore.data = resources
         schedule.eventStore.data = events
         setTodayStatus(todayStatus)
-        // console.log(events)
     };
 
-    // console.log(data)
+    const setCurrentTypes = (type, time, dateString) => {
+        const schedule = window.bryntum.get('scheduler');
+        let startDate = new Date(schedule.startDate)
+        let date = new Date(schedule.startDate)
+        if (type == 'today') {
+            setCurrentType(type);
+            date.setDate(date.getDate() + 1)
+        }
+        if (type == 'week') {
+            setCurrentType(type);
+            date.setDate(date.getDate() + 7)
+        }
+        if (type == 'month') {
+            setCurrentType(type);
+            date.setDate(date.getDate() + 30)
+        }
+        if (type == 'plus') {
+            startDate = new Date(schedule.startDate)
+            startDate.setDate(startDate.getDate() + 1)
+            date = new Date(schedule.endDate)
+            date.setDate(date.getDate() + 1)
+        }
+        if (type == 'minus') {
+            startDate = new Date(schedule.startDate)
+            startDate.setDate(startDate.getDate() - 1)
+            date = new Date(schedule.endDate)
+            date.setDate(date.getDate() - 1)
+        }
+        if (type == 'time') {
+            startDate = new Date(dateString)
+            let count = 1
+            if (currentType == 'week') {
+                count = 7
+            }
+            if (currentType == 'month') {
+                count = 30
+            }
+            date.setDate(startDate.getDate() + count)
+        }
+        schedule.startDate = new Date(startDate)
+        schedule.endDate = new Date(date)
+        setStartDate(startDate)
+        setEndDate(date)
+    };
 
     const findGuest = (text) => {
-        console.log(text)
+        clearTimeout(timer.current);
+        timer.current = setTimeout(async () => {
+            if (text) {
+                let filters = [["Contact", "name", "like", `%${text}%`]]
+                let params = `doctype=Contact&cmd=frappe.client.get_list&fields=${JSON.stringify(["*"])}&filters=${JSON.stringify(filters)}&limit_page_length=None`;
+                let dataArray = await apiPostCall('/', params, window.frappe?.csrf_token)
+                for (let item of dataArray) {
+                    item.value = item.name
+                    item.label = item.name
+                }
+                setGuests(dataArray)
+            } else {
+                setGuests([])
+            }
+        }, 500)
     }
 
+    const onSelectGuest = (record) => {
+        window.open(`${config.hostUrl}/app/query-report/Guest%20History%20HMS?guest=${record}&date=today`, '_blank')
+    }
 
     const onClose = () => {
         setOpen(false);
@@ -1297,6 +411,7 @@ function Home() {
         setIsModalOpen(false);
     };
 
+
     const PickerWithType = ({ type, onChange }) => {
         if (type === 'time') return <TimePicker onChange={onChange} />;
         if (type === 'date') return <DatePicker onChange={onChange} />;
@@ -1314,7 +429,6 @@ function Home() {
     const product = <span>Product Update</span>;
     const quick = <span>Quick Menu</span>;
     const edite = <span>Quick Menu</span>;
-
 
     return (
         <>
@@ -1336,14 +450,20 @@ function Home() {
                             />
                         </Drawer> */}
                         <Image preview={false}
-                            width={150}
-                            src={logo}
+                            height={30}
+                            src={"https://staybird.in/wp-content/uploads/2022/05/updated_logo.png.webp"}
                         />
-                        <Search placeholder="Find Guest" onSearch={findGuest} enterButton />
+                        <AutoComplete
+                            options={guests}
+                            onSelect={onSelectGuest}
+                            onSearch={findGuest}
+                        >
+                            <Input.Search size="large" placeholder="input here" enterButton />
+                        </AutoComplete>
                         <Tooltip title={text} className='icon'>
                             <ExclamationCircleOutlined />
                         </Tooltip>
-                        Mon, Dec 12, 2022 9:19:55 PM
+                        <span id="today_date"></span>
                     </Col>
 
                     <Col xs={{ span: 24 }} lg={{ span: 11 }}>
@@ -1356,7 +476,7 @@ function Home() {
                                     <card-o />
                                 </Tooltip>
 
-                                <Tooltip title={'Add Booking'} className='menu-icon'>
+                                <Tooltip className='menu-icon'>
                                     <i onClick={() => setSide(true)} className="fa fa-calendar-plus-o" aria-hidden="true"></i>
                                     <Drawer
                                         title="Quick Reservation"
@@ -1370,7 +490,9 @@ function Home() {
                                                 <Space>
                                                     <div>
                                                         <p className='check'>Check-in</p>
-                                                        <DatePicker onChange={onChange} />
+                                                        <DatePicker
+                                                        // onChange={onChange}
+                                                        />
                                                     </div>
 
                                                     <div className='time-line'>
@@ -1384,7 +506,9 @@ function Home() {
 
                                                     <div>
                                                         <p className='check'>Check-out</p>
-                                                        <DatePicker onChange={onChange} />
+                                                        <DatePicker
+                                                        //  onChange={onChange} 
+                                                        />
                                                     </div>
                                                     <div className='time-line'>
                                                         <PickerWithType type={type} onChange={(value) => console.log(value)} />
@@ -1712,20 +836,19 @@ function Home() {
 
                             <div className='arizona'>
                                 <div className="btn-group btn-group-sm">
-                                    <button type="button" className="btn btn-primary">Today</button>
-                                    <button type="button" className="btn btn-primary">Week</button>
-                                    <button type="button" className="btn btn-primary">Month</button>
+                                    <button type="button" onClick={() => setCurrentTypes('today')} className={"btn btn-primary " + (currentType == 'today' ? 'active' : '')}>Today</button>
+                                    <button type="button" onClick={() => setCurrentTypes('week')} className={"btn btn-primary " + (currentType == 'week' ? 'active' : '')}>Week</button>
+                                    <button type="button" onClick={() => setCurrentTypes('month')} className={"btn btn-primary " + (currentType == 'month' ? 'active' : '')}>Month</button>
                                 </div>
                             </div>
 
                             <div className='arizona'>
                                 <div className="btn-group btn-group-sm">
-                                    <button type="button" className="btn btn-primary">{'<'}</button>
-                                    <DatePicker onChange={onChange} picker="Date" />
-                                    <button type="button" className="btn btn-primary">{'>'}</button>
+                                    <button type="button" onClick={() => setCurrentTypes('minus')} className="btn btn-primary">{'<'}</button>
+                                    <DatePicker onChange={(date, dateString) => setCurrentTypes('time', date, dateString)} format={dateFormat} />
+                                    {/* <DatePicker value={moment('2015/01/01', dateFormat)} onChange={(dd) => console.log(dd)} format={dateFormat} /> */}
+                                    <button type="button" onClick={() => setCurrentTypes('plus')} className="btn btn-primary">{'>'}</button>
                                 </div>
-
-
                             </div>
 
 
@@ -1785,14 +908,14 @@ function Home() {
                             showSearch
                             placeholder="Select Companys"
                             optionFilterProp="children"
-                            onChange={onChange}
+                            // onChange={onChange}
                             onSearch={onSearch}
                             filterOption={(input, option) =>
                                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                             }
                             options={companys}
                         />
-                        <Switch checkedChildren="Cozy" unCheckedChildren="Complit" defaultChecked />
+                        {/* <Switch checkedChildren="Cozy" unCheckedChildren="Complit" defaultChecked /> */}
                         <Space>
                             <div className='bed-icon'><i onClick={() => setRoom(true)} className="fa fa-bed" aria-hidden="true" /> </div>
 
@@ -1801,11 +924,15 @@ function Home() {
                             >
                                 <Space>
                                     Assign Rooms
-                                    <DatePicker onChange={onChange} style={{ width: 43, }} />
+                                    <DatePicker
+                                        //  onChange={onChange} 
+                                        style={{ width: 43, }} />
                                 </Space>
                                 <br />
                                 <br />
-                                <Carousel afterChange={onChange} autoplay>
+                                <Carousel
+                                    // afterChange={onChange}
+                                    autoplay>
                                     <div style={contentStyle}>
                                         <div className='celnder'>
                                             <div className='vl'></div>
