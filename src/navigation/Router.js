@@ -7,7 +7,6 @@ import {
   Outlet,
   useLocation,
 } from "react-router-dom";
-import Dash from "../pages/Dash";
 import Home from "../pages/Home";
 
 
@@ -16,7 +15,6 @@ function Routers() {
     <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dash" element={<Dash />} />
       </Routes>
     </HashRouter>
   );

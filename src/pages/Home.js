@@ -11,12 +11,10 @@ import {
     CoffeeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
-import config from "../common/config";
+import Config from "../common/Config";
 import Schedule from "../Schedule";
 import { usePostApi } from "../hooks/useFetch";
 import { apiPostCall, apiPutCall } from '../hooks/SiteAPIs'
-import moment from 'moment';
-import dayjs from 'dayjs';
 const { Panel } = Collapse;
 const { Option } = Select;
 let { StringHelper, DateHelper, Toast } = window.bryntum.scheduler;
@@ -28,7 +26,6 @@ const contentStyle = {
 };
 
 const dateFormat = 'YYYY/MM/DD';
-
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
 const selectBefore = (
     <Select defaultValue="Mr." className="select-before">
@@ -50,21 +47,17 @@ function Home() {
     const Edate = new Date()
     const [endDate, setEndDate] = useState(new Date(Edate.setDate(Edate.getDate() + 7)));
     const [currentType, setCurrentType] = useState('week');
-    let allData = usePostApi('/api/method/bizmap_hotel.utill.api.fetch_data', JSON.stringify({ "from_date": config.formatDate(startDate), "to_date": config.formatDate(endDate) }))
+    let allData = usePostApi('/api/method/bizmap_hotel.utill.api.fetch_data', JSON.stringify({ "from_date": Config.formatDate(startDate), "to_date": Config.formatDate(endDate) }))
     const [todayStatus, setTodayStatus] = useState({ all: 0, vacant: 0, Occupied: 0, reserved: 0, blocked: 0, ['Out Of Order']: 0, Dirty: 0 });
     const [companys, setCompanys] = useState([]);
     const [guests, setGuests] = useState([]);
 
-    const { Search } = Input;
     const onSearch = (value) => console.log(value);
     const [open, setOpen] = useState(false);
-    const [opens, setOpens] = useState(false);
-    const [menu, setMenu] = useState(false);
     const [side, setSide] = useState(false);
     const [view, setView] = useState(false);
     const [room, setRoom] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [drawer, setDrawer] = useState(false);
     const { Option, OptGroup } = Select;
     const [type, setType] = useState('time');
     const [openKeys, setOpenKeys] = useState(['sub1']);
@@ -85,25 +78,10 @@ function Home() {
             width: 20,
             region: 'left',
             htmlEncode: false,
-            // renderer: ({ record }) => {
-            //     let roomStatus = JSON.parse(window.sessionStorage.getItem('roomStatus'))
-            //     if (roomStatus) {
-            //         const status = roomStatus.filter(element => element.name == record.status);
-            //         return `<div className="capacity b-fa b-fa-${status[0]?.icon}"></div>`;
-            //     }
-            //     return ''
-            // },
-            // editor: {
-            //     type: 'combo',
-            //     valueField: 'status',
-            //     items: ['Out Of Order', 'Availabel', 'Dirty', 'Occupied'],
-            //     editable: false,
-            //     listeners: {
-            //         select: (e) => {
-            //             ChangeRoomStatus(e?.source?.initialValue, e?.record?.data?.text)
-            //         },
-            //     },
-            // }
+            renderer: ({ record }) => {
+                let icons = { Dirty: 'wrench', Occupied: 'bed', Availabel: 'cube', "Out Of Order": 'close' }
+                return `<i class="fa fa-${icons[record.status]}" aria-hidden="true"></i>`
+            },
         },
         {
             text: 'Room Type', tooltip: 'Room Type', field: 'room_type_name', width: 100, region: 'left', sortable: false
@@ -199,9 +177,9 @@ function Home() {
                     beforeEventEdit({ eventRecord, editor }) {
                         if (eventRecord.data.idx == 0) {
                             if (eventRecord.data.check_in) {
-                                window.open(config.siteUrl + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
+                                window.open(Config.siteUrl + "/app/room-folio-hms/" + eventRecord.data.name, '_blank');
                             } else {
-                                window.open(config.siteUrl + "/app/sales-order/" + eventRecord.data.name, '_blank');
+                                window.open(Config.siteUrl + "/app/sales-order/" + eventRecord.data.name, '_blank');
                             }
                             return false
                         }
@@ -241,13 +219,13 @@ function Home() {
 
         if (document.getElementById("today_date")) {
             let todayDate = document.getElementById("today_date");
-            let date = config.formatTodayDateTime(new Date())
+            let date = Config.formatTodayDateTime(new Date())
             todayDate.innerHTML = date
         }
         setInterval(() => {
             if (document.getElementById("today_date")) {
                 let todayDate = document.getElementById("today_date");
-                let date = config.formatTodayDateTime(new Date())
+                let date = Config.formatTodayDateTime(new Date())
                 todayDate.innerHTML = date
             }
         }, 1000);
@@ -286,6 +264,7 @@ function Home() {
                             events.push({
                                 // id: 11,
                                 resourceId: ID,
+                                // name: ledger.BookingCategory,
                                 name: ledger.GuestName,
                                 contact: ledger.ContactNumber,
                                 company: company.company_name,
@@ -341,6 +320,7 @@ function Home() {
         }
         if (type == 'time') {
             startDate = new Date(dateString)
+            date = new Date(dateString)
             let count = 1
             if (currentType == 'week') {
                 count = 7
@@ -375,7 +355,7 @@ function Home() {
     }
 
     const onSelectGuest = (record) => {
-        window.open(`${config.hostUrl}/app/query-report/Guest%20History%20HMS?guest=${record}&date=today`, '_blank')
+        window.open(`${Config.hostUrl}/app/query-report/Guest%20History%20HMS?guest=${record}&date=today`, '_blank')
     }
 
     const onClose = () => {

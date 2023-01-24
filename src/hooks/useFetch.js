@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { toast } from 'react-toastify';
-import config from "../common/config";
+import Config from "../common/Config";
 
-const baseURL = process.env.REACT_APP_ENV == 'dev' ? config.hostUrl : config.hostUrl
+const baseURL = process.env.REACT_APP_ENV == 'dev' ? Config.hostUrl : Config.hostUrl
 
 export function useGetApi(path) {
     const [res, setRes] = useState({ data: null, error: null, isLoading: false });
@@ -12,7 +12,7 @@ export function useGetApi(path) {
         let isMounted = true
 
         try {
-            let headers = { "content-type": "application/x-www-form-urlencoded; charset=UTF-8", "Authorization": config.token }
+            let headers = { "content-type": "application/x-www-form-urlencoded; charset=UTF-8", "Authorization": Config.token }
             let response = await fetch(baseURL + path, { "headers": headers, "method": 'GET' })
             let res = await response.json()
             if (isMounted) {
@@ -53,7 +53,7 @@ export function usePostApi(path, data) {
             if (typeof window !== "undefined" && window?.frappe?.csrf_token && window?.frappe?.csrf_token != 'None') {
                 headers['X-Frappe-CSRF-Token'] = window?.frappe?.csrf_token
             } else {
-                headers['Authorization'] = config.token
+                headers['Authorization'] = Config.token
             }
             let response = await fetch(baseURL + path, { "headers": headers, "body": data, "method": 'POST' })
             let res = await response.json()
